@@ -433,7 +433,7 @@
             
             // console.log(data1)
             const svg = this.svg
-            let width = (document.getElementById('stat').clientWidth*0.9)
+            let width = (document.getElementById('stat').clientWidth*0.8)
             let height = (document.getElementById('stat').clientHeight*0.8)
             let margin = 40;
             // console.log(document.getElementById('stat').clientHeight)
@@ -468,7 +468,7 @@
                 if(typeof(data1.map(e => e[d])[0])!='string'){
                     scaleY[d] = d3.scaleLinear()
                     .domain([d3.min(data1.map(e => eval(e[d]))), d3.max(data1.map(e => eval(e[d])))])
-                    .range([height-0.5*margin,-0.5*margin])
+                    .range([height-0.5*margin,0.5*margin])
                 }
                 
             });
@@ -517,11 +517,12 @@
 
             
             Ys.append("text")
-                .attr("x", -0.05 * width) 
-                .attr("y", -0.05 * height)
+                .attr("x", 0.05*width) 
+                .attr("y", 0)
                 .attr('font-size', 10)
                 .text(d => { 
-                    return d.split(':').length==1?d.split(':')[0]:d.split(':')[1]});
+                    return d.split(':').length==1?d.split(':')[0]:d.split(':')[1]})
+                
 
             
             Ys.selectAll("text")
@@ -532,9 +533,10 @@
                 .attr("stroke-linejoin", "round")
                 .attr("stroke", "white");
 
+                
             
             
-
+            group.attr("transform", `translate(100, 10)`);
 
             // ******************** legend ********************
 
@@ -576,6 +578,7 @@
                 });
 
             // 
+
             legend.selectAll(".texts")
                 .data(species)
                 .enter()
@@ -585,10 +588,10 @@
                 .attr('y', (d, i) => i * 25 + 35)
                 
                 .text(d => d);
-
+            this.svg.attr("transform", `translate(20, 50)`);
             // 
             
-            this.svg.attr('transform', `translate(100,80)`);
+            
             
         },
         update:function(){
