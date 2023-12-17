@@ -2,9 +2,9 @@
     
     <div id="parameter">
         <t-space  id='check' direction="vertical">
-            <t-cascader  v-model="value1" :options="options" multiple value-mode="parentFirst" />
-            <t-cascader  v-model="value2" :options="options1" multiple value-mode="parentFirst" />
-            <!-- <t-alert theme="error" close='true'> 这是一条失败信息提示 </t-alert> -->
+            <t-cascader  v-model="value1" :options="options" placeholder='select compressor' multiple value-mode="parentFirst" />
+            <t-cascader  v-model="value2" :options="options1" placeholder='select parameter' multiple value-mode="parentFirst" />
+            
         </t-space>
         <t-button id="button" v-on:click="update">Redraw</t-button>
     </div>

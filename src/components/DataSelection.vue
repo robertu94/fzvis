@@ -7,12 +7,12 @@
     <div id="data_selection">
         <p>Enter your Configuration here</p>
 
-        <t-input id = 'input1' v-model="compressor_id" placeholder='null' label="compressor_id:"  @enter="update"/>
-        <t-input id = 'input5' v-model="compressor_name" placeholder='null' label="compressor_name:"  @enter="update"/>
+        <t-input id = 'input1' v-model="compressor_id" placeholder='sz' label="compressor_id:"  @enter="update"/>
+        <t-input id = 'input5' v-model="compressor_name" placeholder='sz1' label="compressor_name:"  @enter="update"/>
 
-        <t-input id = 'input2' v-model="early_config" placeholder='null' label="early_config:"  @enter="update"/>
-        <t-input id = 'input3' v-model="compressor_config" placeholder='null' label="compressor_config:"  @enter="update"/>
-        <t-input id = 'input4' v-model="input_data" placeholder='null' label="path_to_input_data:"  @enter="update"/>
+        <t-input id = 'input2' v-model="early_config" placeholder='{"pressio:metric":"composite","composite:plugins": ["time","size","error_stat","external"]}' label="early_config:"  @enter="update"/>
+        <t-input id = 'input3' v-model="compressor_config" placeholder='{"pressio:abs": 0.001}' label="compressor_config:"  @enter="update"/>
+        <t-input id = 'input4' v-model="input_data" placeholder='/home/yli/lyx/libpressio/test1/libpressio_tutorial/exercises/datasets/CLOUDf48.bin.f32' label="path_to_input_data:"  @enter="update"/>
         <!-- <t-alert theme="error" :message="infoMessage">  </t-alert> -->
         
         <p id="temp1" ></p>
@@ -25,25 +25,31 @@
 <script>
 import axios from 'axios'
 import emitter from './eventBus.js';
+import config from '../../config.json';
 // import { json } from 'd3';
+
 export default {
   name:'DataSelection',
   data(){
       return{
         infoMessage:'',
+        loaddata:false,
+        host:config.API_HOST,
+        port:config.API_PORT,
         loading:false,
-        compressor_id:'sz',
-        early_config:`'{"pressio:metric":"composite","composite:plugins": ["time","size","error_stat","external"]}'`,
-        compressor_config:`'{"pressio:abs": 0.001}'`,
-        input_data:`'/home/yli/lyx/dec_cp.npy'`,
-        compressor_name:'sz1',
+        compressor_id:null,
+        early_config:null,
+        compressor_config:null,
+        input_data:null,
+        compressor_name:null,
         msg:'',
         compare_data:{'compressor_id':[],'bound':[],'metrics':[],'input_data':''},
       };
   },
+  
   methods:{
     update:function(){
-        console.log('changed')
+        
         if(this.compressor_id.length == 0 || this.early_config.length == 0 || this.compressor_config.length == 0){
             this.msg = this.$message.info({
                     content: 'input is illegal',
@@ -58,13 +64,16 @@ export default {
         else{
             // const that = this
             this.loading = true
-
-            axios.post('http://164.107.120.231:5000/indexlist',{
+            // enter 'http://your_ip:5000/indexlist'
+            
+            axios.post("http://"+this.host+':'+ String(this.port)+'/indexlist',{
                 
             'compressor_id':this.compressor_id,
             'early_config':this.early_config,
             'compressor_config':this.compressor_config,
-            'input_data':this.input_data
+            'input_data':this.input_data,
+            'loaddata':this.loaddata,
+            'slice_id':0
             }).then(response=>{
                 
                 let need1 = response.data

@@ -2,12 +2,15 @@
     <div id="data_vis">
         <div id="legendContainer"></div>
         <div>
-    <input id = 'file' type="file" @change="loadJsonFile">
+    <button id='file' @click="showMessage">DataVis</button>
   </div>
             <canvas id="canvas1" width="200" height="200"></canvas>
             <canvas id="colorbarCanvas" width="400" height="30"></canvas>
             
             <t-switch id="switch" size="large" v-model="checked" :label="['add point', 'use current points']"></t-switch>
+            <t-input id='slice_number' label="slice_number:" v-model="slice_number" placeholder=100 autoWidth/>
+            <t-input id='slice_width' label="slice_width:" v-model="slice_width" placeholder=50 autoWidth/>
+            <t-input id='slice_height' label="slice_height:" v-model="slice_height" placeholder=50 autoWidth/>
             <t-input id='slice_id' label="slice_id:" v-model="slice_id" placeholder=23  @enter="onChange" autoWidth/>
 
             <select id="colormapSelect">
@@ -42,20 +45,26 @@ import * as d3 from 'd3'
 // import parameters from '../../js/get_data.js';
 // import { ref, unref, onMounted, onBeforeUnmount, watchEffect } from 'vue';
 import emitter from './eventBus.js';
-
-
+import axios from 'axios'
+import config from '../../config.json';
 export default {
   name:'DataVis',
   data(){
       return{
           parameters:'',
           checked:true,
+          host:config.API_HOST,
+            port:config.API_PORT,
           colormap:'',
           canvas:'',
           context:'',
+          loaddata:false,
           whole_input_data:'',
-          value1: 23,
-          slice_id:23,
+          value1: null,
+          slice_id:null,
+          slice_number:null,
+          slice_width:null,
+          slice_height:null,
           inputNumberProps: { theme: 'column'},
           svg:'',
           margin:40,
@@ -85,6 +94,33 @@ export default {
     
   },
   methods:{
+    showMessage(){
+        this.loaddata = true
+        /
+        axios.post("http://"+this.host+':'+ String(this.port)+'/indexlist',{
+                
+            'loaddata':this.loaddata,
+            'slice_id':this.slice_id,
+            'slice_number':this.slice_number,
+            'slice_width':this.slice_width,
+            'slice_height':this.slice_height
+            }).then(response=>{
+                
+                let need1 = response.data
+                console.log('接受数据',need1)
+                this.input_data=need1
+                this.data_vis()
+                this.defaultcolormap()
+                this.draw()
+            })
+            .catch((error)=>{
+                
+                // this.infoMessage = 'illegal input'
+                alert('illegal input');
+                console.log(error)
+            })
+        
+    },
     loadJsonFile(event) {
       const file = event.target.files[0];
       if (file) {
@@ -109,7 +145,6 @@ export default {
         console.log(path)
 
         // d3.json(path).then((d)=>{
-        that.input_data = that.whole_input_data[this.slice_id]
         const min1 = d3.min(that.input_data.flat())
         const max1 = d3.max(that.input_data.flat())
         this.input_data = this.input_data.map((d)=>d.map(i=>(i-min1)/(max1-min1)))
@@ -490,13 +525,16 @@ export default {
             Plasma: 'linear-gradient(to right, #0d0887, #46039f, #7201a8, #9c179e, #bd3786, #d85763, #ed7953, #fca636, #f0f921)',
             Inferno: 'linear-gradient(to right, #000004, #160b39, #420a68, #6a176e, #932667, #bb3654, #dd513a, #f3771d, #fdb724)',
         };
+        
         const colormapSelect = document.getElementById('colormapSelect');
-        for (const colormapName in defaultColormaps) {
-    const option = document.createElement('option');
-    option.value = colormapName;
-    option.text = colormapName;
-    colormapSelect.appendChild(option);
-}
+        const selectedColormap = colormapSelect.value?colormapSelect.value:"Rainbow"
+        this.colormap = defaultColormaps[selectedColormap].split(', ').slice(1,-1)
+            for (const colormapName in defaultColormaps) {
+        const option = document.createElement('option');
+        option.value = colormapName;
+        option.text = colormapName;
+        colormapSelect.appendChild(option);
+    }
 
 // 默认colormap选择事件监听器
 colormapSelect.addEventListener('change', () => {
@@ -547,8 +585,8 @@ colormapSelect.addEventListener('change', () => {
 }
 #switch{
     position: absolute;
-    top:10%;
-    left:70%;
+    top:3%;
+    left:71%;
     z-index:101
 }
 #color{
@@ -618,6 +656,26 @@ colormapSelect.addEventListener('change', () => {
 #slice_id{
     position: absolute;
     top:2%;
-    left:30%
+    left:30%;
+    z-index:101
+}
+#slice_number{
+    position: absolute;
+    top:10%;
+    left:2%;
+    z-index:101
+
+}
+#slice_width{
+    position: absolute;
+    top:10%;
+    left:37%;
+    z-index:101
+}
+#slice_height{
+    position: absolute;
+    top:10%;
+    left:68%;
+   z-index:101
 }
 </style>
