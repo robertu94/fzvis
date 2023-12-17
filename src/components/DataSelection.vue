@@ -14,7 +14,7 @@
         <t-input id = 'input3' v-model="compressor_config" placeholder='null' label="compressor_config:"  @enter="update"/>
         <t-input id = 'input4' v-model="input_data" placeholder='null' label="path_to_input_data:"  @enter="update"/>
         <!-- <t-alert theme="error" :message="infoMessage">  </t-alert> -->
-        <!-- <t-button id = 'submit' @click="submit">submit</t-button> -->
+        
         <p id="temp1" ></p>
 
     </div>
@@ -85,10 +85,6 @@ export default {
             })
         }
         
-    },
-    submit:function(){
-        
-        
     }
   }
 }
@@ -122,12 +118,7 @@ export default {
     top:45%;
     left:10%
 }
-#submit{
-    position:absolute;
-    z-index:101;
-    top:85%;
-    right:10%
-}
+
 #input4{
     position:absolute;
     width:70%;

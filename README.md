@@ -42,7 +42,7 @@ The dashboard should look like this figure.
   compressor_config: Please include your input with single quotation mark. 
   ```
   ```
-  path_to_input_data: Please enter the absolute path of your input file. Include your input with single quotation mark.
+  path_to_input_data: Please enter the absolute path of your input file. Include your input with single quotation mark. Make sure your data format is '.npy'
   ```
   ```
   compressor_name: The name for this configuration of compressor.
