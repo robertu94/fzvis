@@ -20,6 +20,7 @@ run `npm run serve` to start vue.
 ```
 
 ```
+run `pip3 install -r requirements.txt` to setup the python enviroments.
 run `python3 src/components/main.py` to run the backend code.
 ```
 
