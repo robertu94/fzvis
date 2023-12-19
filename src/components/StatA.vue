@@ -126,14 +126,14 @@
                     selected:''
                 }
             },
-            myChart:''
+            myChart:null
         }
         
         
     },
     mounted() {
         emitter.on('myEvent', (data) => {
-                console.log('收到数据',data['compressor_id']);
+                
                 
                 this.name = data['compressor_id'].map((item)=>{
                     return {
@@ -154,7 +154,10 @@
                 }
                 this.parameters = temp
                 // this.draw_levels()
-
+                if(!this.myChart == null) {
+                this.myChart.dispose()
+                this.myChart = null
+            }
 
 
             // 处理接收到的数据
@@ -176,7 +179,7 @@
             }
             const that = this
             const parameters = this.parameters
-            console.log(this.parameters)
+
             
             //     let index
             //     index =  parseInt(i/2)
@@ -198,7 +201,7 @@
             
             that.stats = parameters.map(item=>Object.keys(item))[0].filter(d=>d!='compressor_id').map(d=>d.split(':')[1])
             
-            console.log('stat',that.stats)
+
             let selected = {}
             let record = {}
             this.name.forEach((i)=>{
@@ -210,7 +213,7 @@
                 // console.log(parameters.map((j)=>j[Object.keys(parameters[0])[i+1]]),)
                 // console.log(Object.values(parameters[0]).filter((item,j)=>Object.keys(parameters[0])[j]!='compressor_id'))
                 const u = normalize(parameters.filter(item=>Object.keys(item)!='compressor_id').map((j)=>j[Object.keys(parameters[0])[i]]).map(item=>parseFloat(item)))
-                console.log(item,u)
+            
                 // record.push(m)
                 // console.log('v',parameters.map((j)=>j[Object.keys(parameters[0])[i+1]]).map(item=>parseFloat(item)))
                 if(!u.includes(NaN)){
@@ -262,8 +265,7 @@
                 record[item['compressor_id']] = value
                 
             })
-            // console.log(series.map(d=>d.name))
-            console.log('村数据',record)
+    
             this.option.legend.selected = selected
             // const that = this
             // let width = (window.innerWidth*0.7)/1.05;
@@ -306,8 +308,9 @@
                     }
                     return htmlStr;
                     }
-    
+
             var chartDom = document.getElementById('stat');
+            echarts.init(document.getElementById('stat')).dispose(); 
             let myChart = echarts.init(chartDom);
             var option = that.option
             option && myChart.setOption(option);
@@ -316,13 +319,14 @@
                 
                 // that.draw_parallel_c(that.parameters)
                 if(params.componentType =="xAxis" || params.componentType =="yAxis"){
-                    if(that.checked_c.includes(params.value)){
-                        that.checked_c = that.checked_c.filter(item=>item!=params.value)
+                    if(!that.checked_c.includes(params.value)){
+                        that.checked_c.push(params.value)
+                        
                     }
                     else{
-                        that.checked_c.push(params.value)
+                        that.checked_c = that.checked_c.filter(item=>item!=params.value)
                     }
-                    // console.log(that.checked_c)
+                    console.log(that.checked_c,that.name)
                     // const yAxisName = params.value
                     // const yAxisItem = {
                     // value: yAxisName,
@@ -409,9 +413,13 @@
         },
         draw:function(){
             // const data = document.getElementById('temp1').innerHTML
-            const that = this
             
-            console.log('djka',that.parameters,that.name)
+            this.checked_c = []
+            if(!this.myChart == null) {
+                echarts.init(document.getElementById('stat')).dispose(); 
+                this.myChart.dispose()
+                this.myChart = null
+            }
             this.draw_levels()
         },
         draw_parallel_c: function(data){
@@ -601,8 +609,9 @@
                 
                 document.getElementById('temp').innerHTML = String(this.checked_c)
                 emitter.emit('checkevent', {'checked_c':this.checked_c,'parameter':this.parameters});
-                console.log('改变了',this.checked_c)
+
                 document.getElementById('compressor').innerHTML='all_compressors'
+                
                 let width = (document.getElementById('stat').clientWidth*0.9)
                 let height = (document.getElementById('stat').clientHeight*0.8)
                 this.myChart.dispose()
@@ -618,7 +627,10 @@
                 document.getElementById('compressor').innerHTML='compressor_compare'
                 const that = this
                 // this.checked_c = []
+                
                 var chartDom = document.getElementById('stat');
+                // var chartDom = document.getElementById('stat');
+                echarts.init(document.getElementById('stat')).dispose(); 
                 let myChart = echarts.init(chartDom);
                 // myChart.resize({
                 //     width: 70,
@@ -628,19 +640,23 @@
 
                 var option = that.option
                 option && myChart.setOption(option);
-                that.myChart = myChart
+                that.myChart = myChart;
+
                 // that.myChart.width=70
                 myChart.on("click",function(params){
                 
                 // that.draw_parallel_c(that.parameters)
+                
                 if(params.componentType =="xAxis" || params.componentType =="yAxis"){
-                    if(that.checked_c.includes(params.value)){
-                        that.checked_c = that.checked_c.filter(item=>item!=params.value)
+                    if(!that.checked_c.includes(params.value)){
+                        that.checked_c.push(params.value)
+                        
                     }
                     else{
-                        that.checked_c.push(params.value)
+                        that.checked_c = that.checked_c.filter(item=>item!=params.value)
                     }
-                    
+                    console.log(that.checked_c)
+                    console.log(that.name)
                     that.name.forEach((item,i)=>{
                         // console.log(item)
                         if(that.checked_c.includes(item.value)){
@@ -691,6 +707,7 @@
                 
                 myChart.setOption(option,true);
         })
+
             }
         }
 
