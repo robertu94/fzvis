@@ -42,8 +42,7 @@
 
 <script>
 import * as d3 from 'd3'
-// import parameters from '../../js/get_data.js';
-// import { ref, unref, onMounted, onBeforeUnmount, watchEffect } from 'vue';
+
 import emitter from './eventBus.js';
 import axios from 'axios'
 import config from '../../config.json';

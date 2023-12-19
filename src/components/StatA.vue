@@ -12,7 +12,7 @@
   <script>
   import * as d3 from 'd3' 
   import * as echarts from 'echarts'
-//   import parameters from '../../js/get_data.js'
+
   import emitter from './eventBus';
   export default {
     name:'StatA',

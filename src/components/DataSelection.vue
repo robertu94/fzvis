@@ -26,7 +26,6 @@
 import axios from 'axios'
 import emitter from './eventBus.js';
 import config from '../../config.json';
-// import { json } from 'd3';
 
 export default {
   name:'DataSelection',

@@ -12,7 +12,6 @@ import StatA from './components/StatA.vue'
 import ParaMeter from './components/ParaMeter.vue'
 import DataVis from './components/DataVis.vue'
 import DataSelection from './components/DataSelection.vue'
-// import VtkT from './components/VtkT.vue'
 export default {
   name: 'App',
   
@@ -20,8 +19,7 @@ export default {
     StatA,
     ParaMeter,
     DataVis,
-    DataSelection,
-    // VtkT
+    DataSelection
   },
   
 }
