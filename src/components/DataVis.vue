@@ -565,10 +565,10 @@ colormapSelect.addEventListener('change', () => {
     border:2px solid #a7b2ac;
     border-radius: 4px;
     position:absolute;
-    top:28%;
+    top:40%;
     left:.7%;
     width: 28%;
-    height: 70%;
+    height: 58%;
     background-color:'lightgrey'
 }
 #data_svg{

@@ -6,14 +6,15 @@
   </t-space>
     <div id="data_selection">
         <p>Enter your Configuration here</p>
-
+        
         <t-input id = 'input1' v-model="compressor_id" placeholder='sz' label="compressor_id:"  @enter="update"/>
         <t-input id = 'input5' v-model="compressor_name" placeholder='sz1' label="compressor_name:"  @enter="update"/>
-
-        <t-input id = 'input2' v-model="early_config" placeholder='{"pressio:metric":"composite","composite:plugins": ["time","size","error_stat","external"]}' label="early_config:"  @enter="update"/>
-        <t-input id = 'input3' v-model="compressor_config" placeholder='{"pressio:abs": 0.001}' label="compressor_config:"  @enter="update"/>
-        <t-input id = 'input4' v-model="input_data" placeholder='/home/yli/lyx/libpressio/test1/libpressio_tutorial/exercises/datasets/CLOUDf48.bin.f32' label="path_to_input_data:"  @enter="update"/>
-        <!-- <t-alert theme="error" :message="infoMessage">  </t-alert> -->
+        
+        
+        <t-textarea auto-width id = 'input2' v-model="early_config" placeholder='early_config:{"pressio:metric":"composite","composite:plugins": ["time","size","error_stat","external"]}' label="early_config:"  @enter="update"/>
+        <t-textarea  auto-width id = 'input3' v-model="compressor_config" placeholder='compressor_config:{"pressio:abs": 0.001}' label="compressor_config:"  @enter="update"/>
+        <t-input id = 'input4' v-model="input_data" placeholder='/path_to_input_data' label="path_to_input_data:"  @enter="update"/>
+       
         
         <p id="temp1" ></p>
 
@@ -106,7 +107,7 @@ export default {
     top:1%;
     left:.7%;
     width: 28%;
-    height: 26%;
+    height: 38%;
 }
 #input1{
     position:absolute;
