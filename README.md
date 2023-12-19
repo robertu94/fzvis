@@ -2,7 +2,7 @@
 ## Prerequisites
 
 1.  libpressio
-2.  nodejs, vue
+2.  nodejs, vue.js (nodejs: https://nodejs.org/en, vue: https://vuejs.org/)
 3.  python (flask, flask_cors, json, numpy)
 
 ## Project setup
