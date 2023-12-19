@@ -5,7 +5,7 @@
 2.  nodejs, vue.js (nodejs: https://nodejs.org/en, vue: https://vuejs.org/)
 3.  python (flask, flask_cors, json, numpy)
 
-## Project setup
+### Project setup
 ```
 cd to the path that you git clone the code
 run `npm install`
@@ -50,26 +50,31 @@ The dashboard should look like this figure.
   ```
   compressor_name: The name for this configuration of compressor.
   ```
-  After running all the compressors you need for visualization, click draw on module D. The reuslt in module D should be like the figure below:
-  You can add a new compressor by enter the configuration in module A, remember to click the button Draw in module D to get the new result.
+  - After running all the compressors you need for visualization, click draw on module D.
+  - The reuslt in module D should be like the figure below:
+  
 <img width="1038" alt="image" src="https://github.com/YuxiaoLi1234/fzvis/assets/143280350/4e6f1403-e7be-4e2f-97d8-ffbc21801ae3">
+
+- You can add a new compressor by enter the configuration in module A, remember to click the button Draw in module D to get the new result.
 
 ### Interaction usage:
 ## Compare Matrics among Compressors.
-After running all compressors, you need to click on the name of the compressors you want to compare:
+1. After running all compressors, you need to click on the name of the compressors you want to compare:
 <img width="850" alt="image" src="https://github.com/YuxiaoLi1234/fzvis/assets/143280350/be90256f-ad14-4e28-a7d6-9383e85b5734">
-click on the compressor_compare button, the result shoule be like the figure below:
+
+2. Click on the compressor_compare button, the result shoule be like the figure below:
 <img width="1028" alt="image" src="https://github.com/YuxiaoLi1234/fzvis/assets/143280350/9b62cdaa-fe26-43c6-ac68-f71e1f615407">
+
 (click on the all_compressor button to return to the visualization of barcharts of all of the compressors)
-then you could interactively select the parameter and compressor you want in module B.
+3. Then you could interactively select the parameter and compressor you want in module B.
 
 ## Input Data Vis:
-After running the compressors, you can visualize the slice of your input data in module C.
-Make sure that you input your slice_id, format of your inputdata.
-Click on the DataVis button to visualize your data.
+- After running the compressors, you can visualize the slice of your input data in module C.
+- Make sure that you input your slice_id, format of your inputdata.
+- Click on the DataVis button to visualize your data.
+- There is a defaultcolormap selector on the top left. You can also add control points by clicking on the colormap for the colormap (under the mode of "add_points")/ drag the existing control points (under the mode of "use current control points").
 <img width="424" alt="image" src="https://github.com/YuxiaoLi1234/fzvis/assets/143280350/7bbbc7e4-20fa-49d3-88f3-f701018bc6b0">
-There is a defaultcolormap selector on the top left. You can also add control points by clicking on the colormap for the colormap (under the mode of "add_points")/ drag the existing control points (under the mode of "use current control points").
-exited control points to 
+
 
 
 
