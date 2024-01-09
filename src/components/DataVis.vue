@@ -45,7 +45,7 @@ import * as d3 from 'd3'
 
 import emitter from './eventBus.js';
 import axios from 'axios'
-import config from '../../config.json';
+import config from './config.json';
 export default {
   name:'DataVis',
   data(){

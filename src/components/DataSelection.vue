@@ -26,7 +26,7 @@
 <script>
 import axios from 'axios'
 import emitter from './eventBus.js';
-import config from '../../config.json';
+import config from './config.json';
 
 export default {
   name:'DataSelection',

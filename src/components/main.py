@@ -1,9 +1,11 @@
+#!/usr/bin/env python
+
 from flask import Flask, request
 from flask_cors import CORS
 import json
 from pathlib import Path
 import numpy as np
-
+from argparse import ArgumentParser
 import libpressio
 import math
 # a way to upload the input data is needed
@@ -138,20 +140,38 @@ def indexlist():
     else:
         return 'configuration is illegal'
 
+parser = ArgumentParser(description="enter your HOST/POST.",
+                                     usage="path/to/main.py [OPTIONAL ARGUMENTS] <HOST> <PORT> <configfile>")
 
+parser.add_argument('--HOST', nargs='?', help='HOST_address', default="localhost")
+parser.add_argument('--PORT', nargs='?', help='PORT_address', default="5000")
+
+parser.add_argument('--configfile', nargs='?', help='your_config_file', default=None)
 
 if __name__ == '__main__':
     input_data = None
-   
-
+    input = parser.parse_args()
+    if not any(vars(input).values()):
+        parser.print_help()
     # 加载配置文件
     print(Path(__file__).parent)
-    config_path =Path(__file__).parent / "../../config.json"
-    with open(config_path, 'r') as config_file:
-        config = json.load(config_file)
+    if(input.configfile):
+        config_path = input.configfile
+        with open(config_path, 'r') as config_file:
+            config = json.load(config_file)
         # print(content)
-
-    api_host = config['API_HOST']
-    api_port = config['API_PORT']
+            api_host = config['API_HOST']
+            api_port = config['API_PORT']
+    else:
+        api_host = input.HOST
+        api_port = input.PORT
+    config = {
+        "API_HOST": api_host,
+        
+        "API_PORT": api_port
+        
+        }
+    with open('config.json', 'w') as json_file:
+        json.dump(config, json_file, indent=4)
     # print(api_host,api_port)
     app.run(host=api_host,port = api_port,debug=True)
