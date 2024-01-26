@@ -36,10 +36,10 @@ def indexlist():
             return obj
     def comparing_compressor(arguments):
         global input_data
-        input_path = eval(arguments['input_data'])
-        print(input_path)
-        input_data = np.fromfile(input_path, dtype=np.float32)
-        print(len(input_data))
+        # input_path = arguments['input_data']
+        # print(input_path)
+        input_data = arguments['input_data']
+        print(input_data)
         # print(eval(arguments["compressor_config"]))
         configs = {
                 "compressor_id": arguments["compressor_id"],
@@ -85,11 +85,13 @@ def indexlist():
         
         if not loaddata:
             
+            input_data = np.array(json.loads(request.data)['input_data'],dtype=np.float32)
+            print(input_data)
             compressor_id = json.loads(request.data)['compressor_id']
-            print(eval(json.loads(request.data)['early_config']))
+            
             early_config = json.loads(eval(json.loads(request.data)['early_config']))
             compressor_config = json.loads(eval(json.loads(request.data)['compressor_config']))
-            input_data = json.loads(request.data)['input_data']
+            
         
         # print(json.loads(early_config))
         # print('读入的shihou',type(json.loads(eval(compressor_config))))
@@ -172,6 +174,7 @@ if __name__ == '__main__':
         
         }
     with open('config.json', 'w') as json_file:
+        # print('写入')
         json.dump(config, json_file, indent=4)
     # print(api_host,api_port)
     app.run(host=api_host,port = api_port,debug=True)

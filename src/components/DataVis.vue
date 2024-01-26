@@ -8,6 +8,9 @@
             <canvas id="colorbarCanvas" width="400" height="30"></canvas>
             
             <t-switch id="switch" size="large" v-model="checked" :label="['add point', 'use current points']"></t-switch>
+            
+           
+            
             <t-input id='slice_number' label="slice_number:" v-model="slice_number" placeholder=100 autoWidth/>
             <t-input id='slice_width' label="slice_width:" v-model="slice_width" placeholder=50 autoWidth/>
             <t-input id='slice_height' label="slice_height:" v-model="slice_height" placeholder=50 autoWidth/>
@@ -50,10 +53,12 @@ export default {
   name:'DataVis',
   data(){
       return{
+            uploadMethod: 'requestSuccessMethod',
           parameters:'',
           checked:true,
           host:config.API_HOST,
             port:config.API_PORT,
+          file:[],
           colormap:'',
           canvas:'',
           context:'',
@@ -92,7 +97,49 @@ export default {
     
     
   },
+  computed: {
+    requestMethod() {
+      return this[this.uploadMethod];
+    },
+  },
+  watch: {
+    // 切换上传示例时，重置 files 数据
+    uploadMethod() {
+      this.files = [];
+    },
+  },
   methods:{
+    requestSuccessMethod(file /** UploadFile */) {
+      console.log(file, file.raw);
+      return new Promise((resolve) => {
+        // 控制上传进度
+        let percent = 0;
+        const percentTimer = setInterval(() => {
+          if (percent + 10 < 99) {
+            percent += 10;
+            this.$refs.uploadRef.uploadFilePercent({ file, percent });
+          } else {
+            clearInterval(percentTimer);
+          }
+        }, 100);
+
+        const timer = setTimeout(() => {
+          // resolve 参数为关键代码
+          resolve({ status: 'success', response: { url: 'https://tdesign.gtimg.com/site/avatar.jpg' } });
+
+          clearTimeout(timer);
+          clearInterval(percentTimer);
+        }, 800);
+      });
+    },
+    requestFailMethod(file /** UploadFile */) {
+      console.log(file);
+      return new Promise((resolve) => {
+        // resolve 参数为关键代码
+        resolve({ status: 'fail', error: '上传失败，请检查文件是否符合规范' });
+      });
+    },
+    
     showMessage(){
         this.loaddata = true
         /
@@ -120,21 +167,7 @@ export default {
             })
         
     },
-    loadJsonFile(event) {
-      const file = event.target.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-          const data = JSON.parse(e.target.result);
-          console.log(data);
-          this.whole_input_data = data
-          this.data_vis()
-            this.defaultcolormap()
-          // 这里可以处理读取到的数据
-        };
-        reader.readAsText(file);
-      }
-    },
+    
     data_vis:function(){
 
         
@@ -624,8 +657,9 @@ colormapSelect.addEventListener('change', () => {
 #colormapSelect{
     position:absolute;
     left:10px; 
-    top:10px;
-    width:25%
+    top:2%;
+    width:25%;
+    height:6%;
 }
 .legend-item {
   display: flex;
@@ -675,6 +709,11 @@ colormapSelect.addEventListener('change', () => {
     position: absolute;
     top:10%;
     left:68%;
-   z-index:101
+    z-index:101
+}
+#fileloader{
+    position: absolute;
+    top:2%;
+    left:2%;
 }
 </style>
