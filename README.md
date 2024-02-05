@@ -1,14 +1,13 @@
 ### Tutorial
 ## Prerequisites
 
-1.  libpressio
-2.  nodejs, vue.js (nodejs: https://nodejs.org/en, vue: https://vuejs.org/)
-3.  python (flask, flask_cors, json, numpy)
+1.  docker
 
 ### Project setup
 ```
-cd to the path that you git clone the code
-run `npm install`
+git clone
+cd fzvis
+run `docker-compose up`
 ```
 
 ### Compiles and hot-reloads for development
