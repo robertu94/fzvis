@@ -28,7 +28,7 @@
 <script>
 import axios from 'axios'
 import emitter from './eventBus.js';
-import config from './config.json';
+import config from '../../config.json';
 // import Npyjs from 'npyjs';
 export default {
   name:'DataSelection',
@@ -185,7 +185,7 @@ export default {
             this.loading = true
             // enter 'http://your_ip:5000/indexlist'
             console.log(this.fileContent)
-            // console.log("http://"+this.host+':'+ String(this.port)+'/indexlist')
+            console.log("http://"+this.host+':'+ String(this.port)+'/indexlist')
             axios.post("http://"+this.host+':'+ String(this.port)+'/indexlist',{
                 
             'compressor_id':this.compressor_id,

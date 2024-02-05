@@ -1,4 +1,6 @@
-#!/usr/bin/env python
+
+import os
+
 
 from flask import Flask, request
 from flask_cors import CORS
@@ -157,16 +159,18 @@ if __name__ == '__main__':
         parser.print_help()
     # 加载配置文件
     print(Path(__file__).parent)
-    if(input.configfile):
-        config_path = input.configfile
-        with open(config_path, 'r') as config_file:
-            config = json.load(config_file)
-        # print(content)
-            api_host = config['API_HOST']
-            api_port = config['API_PORT']
-    else:
-        api_host = input.HOST
-        api_port = input.PORT
+    api_host = os.getenv('HOST', '0.0.0.0')
+    api_port = int(os.getenv('PORT', '5000'))
+    # if(input.configfile):
+    #     config_path = input.configfile
+    #     with open(config_path, 'r') as config_file:
+    #         config = json.load(config_file)
+    #     # print(content)
+    #         api_host = config['API_HOST']
+    #         api_port = config['API_PORT']
+    # else:
+    # api_host = input.HOST
+    # api_port = input.PORT
     config = {
         "API_HOST": api_host,
         
