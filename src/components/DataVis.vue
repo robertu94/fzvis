@@ -62,7 +62,7 @@ export default {
           colormap:'',
           canvas:'',
           context:'',
-          loaddata:false,
+          loaddata:0,
           whole_input_data:'',
           value1: null,
           slice_id:null,
@@ -141,11 +141,11 @@ export default {
     },
     
     showMessage(){
-        this.loaddata = true
-        /
+        this.loaddata = 1
+        
         axios.post("http://"+this.host+':'+ String(this.port)+'/indexlist',{
                 
-            'loaddata':this.loaddata,
+            'loaddata':1,
             'slice_id':this.slice_id,
             'slice_number':this.slice_number,
             'slice_width':this.slice_width,
@@ -207,6 +207,7 @@ export default {
         const canvas = that.canvas
         const context = that.context
         const data = that.input_data;
+
         const min = d3.min(that.input_data.flat())
         const max = d3.max(that.input_data.flat())
         const q1 = calculatePercentile(that.input_data.flat(), 25);
@@ -301,14 +302,19 @@ export default {
         // 绘制数据映射结果
         function drawData(data) {
             const colorData = mapDataToColor(data);
-            
+            var blockSize = canvas.width/(colorData[0].length)
+            var blockSize1 = canvas.height/(colorData.length)
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 绘制新的数据映射
             for (let i = 0; i < colorData.length; i++) {
                 for (let j = 0; j < colorData[i].length; j++) {
                     const color = colorData[i][j];
                     context.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
-                    context.fillRect(j, i, 1, 1);
+                    context.fillRect(j*blockSize, i*blockSize1, blockSize, blockSize1);
                 }
             }
+            
         }
         drawData(data);
 // 开始绘制
@@ -329,7 +335,7 @@ export default {
             
             for (const point of colorControlPoints) {
                 // 使用正确的CSS颜色格式
-                
+                console.log(point.value)
                 gradient.addColorStop(point.value/255, `rgb(${point.color.r}, ${point.color.g}, ${point.color.b})`);
             }
 
@@ -460,14 +466,19 @@ export default {
             const b = min1.b + clickX/colorbarWidth*(max1.b-min1.b)
             const g = min1.r + clickX/colorbarWidth*(max1.g-min1.g)
             const newPoint = {
-            value: value,
-            
-            radius: 7, // 圆的半径，可以根据需要进行调整
-            color: {r: r, g: g, b: b} // 圆的颜色，可以根据需要进行调整
+                value: value,
+                
+                radius: 7, // 圆的半径，可以根据需要进行调整
+                color: {r: r, g: g, b: b} // 圆的颜色，可以根据需要进行调整
             };
 
             // 将新的圆形数据对象添加到数组中
-            colorControlPoints.push(newPoint);
+            if (value>0 && value<=255){
+                colorControlPoints.push(newPoint)
+            }
+                
+            
+            
             // console.log(colorControlPoints)
             // 重绘色条和所有圆形
             // drawColorbar(); // 假设这是您绘制色条背景的函数
@@ -507,6 +518,8 @@ export default {
             const colorData = mapDataToColor(data);
 
             // 清空canvas
+            var blockSize = canvas.width/(colorData[0].length)
+            var blockSize1 = canvas.height/(colorData.length)
             context.clearRect(0, 0, canvas.width, canvas.height);
 
             // 绘制新的数据映射
@@ -514,7 +527,7 @@ export default {
                 for (let j = 0; j < colorData[i].length; j++) {
                     const color = colorData[i][j];
                     context.fillStyle = `rgb(${color.r}, ${color.g}, ${color.b})`;
-                    context.fillRect(j, i, 1, 1);
+                    context.fillRect(j*blockSize, i*blockSize1, blockSize, blockSize1);
                 }
             }
         }

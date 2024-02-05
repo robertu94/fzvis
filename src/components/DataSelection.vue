@@ -36,11 +36,12 @@ export default {
       return{
         uploadMethod: 'requestSuccessMethod',
         fileContent:"",
+        formData: new FormData(),
         files:[],
         reader : new FileReader(),
         infoMessage:'',
         file:'',
-        loaddata:false,
+        loaddata:0,
         host:config.API_HOST,
         port:config.API_PORT,
         loading:false,
@@ -66,7 +67,7 @@ export default {
   },
   methods:{
     
-    handleFileChange(event) {
+    handleFileChange1(event) {
         const file = event.target.files[0];
         let reader = new FileReader();
         var _this = this;
@@ -96,15 +97,56 @@ export default {
                     reader.readAsText(file);
                     break;
                 case 'npy':
-                    // reader = new Npyjs();
-                    // n.load("test.npy");
-                    // reader.parse(file, (data) => {
-                    //     // 'data' 是从 .npy 文件解析出的数据
-                    //     console.log(data);
-                    // });
-                    reader.onload = function(array) {
+                    
+                    reader.onload = function(arrayBuffer) {
+                        let array = arrayBuffer.target.result
+                        const dataView = new DataView(array);
+                        const decoder = new TextDecoder("ascii");
                         
-                        let float32Array = Array.from(new Float32Array(array.target.result));
+                        // 魔数和版本号
+                        const magic = decoder.decode(new Uint8Array(array.slice(0, 6)));
+                        console.log(magic)
+                        if (magic !== '\x93NUMPY') {
+                            throw new Error('Not a valid .npy file');
+                        }
+                        
+                        const majorVersion = dataView.getUint8(6);
+                        // const minorVersion = dataView.getUint8(7);
+                        let headerLength, offset;
+                        if (majorVersion === 1) {
+                            headerLength = dataView.getUint16(8, true); // Assuming little-endian
+                            offset = 10;
+                        } else if (majorVersion === 2) {
+                            headerLength = dataView.getUint32(8, true); // Assuming little-endian
+                            offset = 12;
+                        } else {
+                            throw new Error('Unsupported .npy version');
+                        }
+                        
+                        // 读取头部内容
+                        const headerStr = decoder.decode(new Uint8Array(array.slice(offset, offset + headerLength)));
+                        console.log("Header:", headerStr);
+                        const dataType = headerStr.dataType; // 例如 'float32'
+                        const dataOffset = headerStr.dataOffset; // 数据开始的位置
+                        const dataLength = headerStr.dataLength; // 数据长度，根据形状计算得出
+                        console.log(dataType)
+                        let typedArray;
+                        switch (dataType) {
+                            case 'float32':
+                                typedArray = new Float32Array(array, dataOffset, dataLength);
+                                break;
+                            case 'int32':
+                                typedArray = new Int32Array(array, dataOffset, dataLength);
+                                break;
+                            case 'float64':
+                              typedArray = new Float64Array(array, dataOffset, dataLength);
+                                  break;
+                            // 添加更多数据类型的处理...
+                            default:
+                                throw new Error('Unsupported data type');
+                        }
+                        console.log(typedArray)
+                        let float32Array = Array.from(new Float64Array(array));
                         // let blob = new Blob([float32Array], { type: 'application/octet-stream' });
                         _this.fileContent = float32Array
                         console.log(float32Array);
@@ -112,7 +154,7 @@ export default {
 
                     reader.readAsArrayBuffer(file);
                     break;
-                default:
+            default:
                 // 未知文件类型
                     console.log('Unknown file type');
             }
@@ -133,6 +175,25 @@ export default {
 
         // console.log(_this.fileContent) // String 
     },
+
+    handleFileChange(event){
+      const _this = this
+      // const input = document.getElementById('fileloader');
+      const file = event.target.files[0]; // 获取选中的文件
+      // const formData = new FormData();
+      
+      _this.formData.append("file", file); // 将文件添加到表单数据中
+      // _this.fileContent = formData
+      // fetch('/upload', { // 假设 '/upload' 是你的后端接口
+      //     method: 'POST',
+      //     body: formData,
+      // })
+      // .then(response => response.json())
+      // .then(data => console.log(data))
+      // .catch(error => console.error('Error:', error));
+      console.log(_this.fileContent)
+    },
+
     requestSuccessMethod(file /** UploadFile */) {
       console.log(file, file.raw);
       return new Promise((resolve) => {
@@ -186,16 +247,25 @@ export default {
             // enter 'http://your_ip:5000/indexlist'
             console.log(this.fileContent)
             console.log("http://"+this.host+':'+ String(this.port)+'/indexlist')
-            axios.post("http://"+this.host+':'+ String(this.port)+'/indexlist',{
+            this.formData.append('compressor_id', this.compressor_id);
+            this.formData.append('early_config', this.early_config);
+            this.formData.append('compressor_config', this.compressor_config);
+            this.formData.append('loaddata',this.loaddata);
+            this.formData.append('slice_id',0)
+            this.formData.compressor_id = this.compressor_id
+            axios.post("http://"+this.host+':'+ String(this.port)+'/indexlist',
+            // {
                 
-            'compressor_id':this.compressor_id,
-            'early_config':this.early_config,
-            'compressor_config':this.compressor_config,
-            'input_data':this.fileContent,
-            'loaddata':this.loaddata,
-            'slice_id':0,
+            // 'compressor_id':this.compressor_id,
+            // 'early_config':this.early_config,
+            // 'compressor_config':this.compressor_config,
+            // 'input_data':this.fileContent,
+            // 'loaddata':this.loaddata,
+            // 'slice_id':0,
             
-            }).then(response=>{
+            // }
+            this.formData
+            ).then(response=>{
                 
                 let need1 = response.data
                 console.log('接受数据',typeof(need1))
@@ -206,6 +276,7 @@ export default {
                 document.getElementById('temp1').innerHTML=JSON.stringify(this.compare_data)
                 emitter.emit('myEvent', this.compare_data);
                 this.loading = false
+                this.formData = new FormData()
             })
             .catch((error)=>{
                 this.loading = false
