@@ -5,7 +5,7 @@
 
 ### Project setup
 ```
-git clone
+git clone https://github.com/YuxiaoLi1234/fzvis.git
 cd fzvis
 run `docker-compose up`
 ```
