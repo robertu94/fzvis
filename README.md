@@ -38,13 +38,16 @@ The dashboard should look like this figure.
   compresoor_id: Please enter the compressor that is supported by libpressio.
   ```
   ```
+  You can upload load your file by the fileloader (you can also download the example data "inputfile500.npy/inputfile1000.npy" in the file.
+  ```
+  ```
   early config: Please include your input with single quotation mark, if you are going to include a path in your configuration, please make sure you entered the absolute path.
   ```
   ```
   compressor_config: Please include your input with single quotation mark. 
   ```
   ```
-  path_to_input_data: Please enter the absolute path of your input file. Include your input with single quotation mark. Make sure your data format is '.npy'
+  
   ```
   ```
   compressor_name: The name for this configuration of compressor.
