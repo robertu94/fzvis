@@ -7,7 +7,6 @@ services:
     depends_on:
       - frontend
   frontend:
-    frontend:
     image: yli14025/fzvis:frontend  # 使用Docker Hub上的前端镜像
     ports:
       - "8080:8080"
