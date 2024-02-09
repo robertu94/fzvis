@@ -175,7 +175,7 @@ if __name__ == '__main__':
     # 加载配置文件
     print(Path(__file__).parent)
     api_host = os.getenv('HOST', '0.0.0.0')
-    api_port = int(os.getenv('PORT', '5014'))
+    api_port = int(os.getenv('PORT', '5000'))
     # if(input.configfile):
     #     config_path = input.configfile
     #     with open(config_path, 'r') as config_file:
