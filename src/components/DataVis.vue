@@ -644,20 +644,20 @@ colormapSelect.addEventListener('change', () => {
 }
 #colorbarCanvas{
     position:absolute;
-    top:80%;
-    left:7%;
+    top:90%;
+    left:10%;
     
     z-index:101
 }
 #dataCanvas{
     position:absolute;
-    left:130px; 
+    left:120px; 
     top:100px;
     /* z-index:101; */
 }
 #canvas1{
     position:absolute;
-    left:50px; 
+    left:90px; 
     top:150px;
     width:60%
     

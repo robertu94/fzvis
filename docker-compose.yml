@@ -1,13 +1,19 @@
 version: '2'
 services:
   backend:
-    image: yli14025/fzvis:backend  # 使用Docker Hub上的后端镜像
+    build:
+      context: .  
+      
+      dockerfile: Dockerfile-backend
     ports:
-      - "5000:5000"
+      - "5000:5000"  
     depends_on:
-      - frontend
+      - frontend 
+    image: fzvis_backend:latest 
   frontend:
-    frontend:
-    image: yli14025/fzvis:frontend  # 使用Docker Hub上的前端镜像
+    build:
+      context: .  
     ports:
-      - "8080:8080"
+      - "8080:8080"  
+  
+    image: fzvis_frontend:latest 

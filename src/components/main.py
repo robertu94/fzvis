@@ -92,21 +92,21 @@ def indexlist():
         print(loaddata)
         
         if loaddata==0:
-            print(request.data)
-            print(request.files)
+            # print(request.data)
+            # print(request.files)
             file = request.files['file']
      
             
             input_data = np.load(file)
-            print(input_data)
+            # print(input_data)
             # compressor_id = json.loads(request.data)['compressor_id']
             
             # early_config = json.loads(eval(json.loads(request.data)['early_config']))
             # compressor_config = json.loads(eval(json.loads(request.data)['compressor_config']))
             compressor_id = request.form['compressor_id']
             
-            early_config = json.loads(eval(request.form.get('early_config')))
-            compressor_config = json.loads(eval(request.form.get('compressor_config')))
+            early_config = json.loads(request.form.get('early_config'))
+            compressor_config = json.loads(request.form.get('compressor_config'))
             # print(type(json.loads(eval(compressor_config))))
         
         # print(json.loads(early_config))
@@ -152,7 +152,7 @@ def indexlist():
             slice_width = eval(json.loads(request.data)['slice_width'])
             slice_height = eval(json.loads(request.data)['slice_height'])
             sliced_id = eval(json.loads(request.data)['slice_id'])
-            print(slice_number,sliced_id,slice_width,slice_height,type(input_data),len(input_data))
+            # print(slice_number,sliced_id,slice_width,slice_height,type(input_data),len(input_data))
             array = input_data.reshape(slice_number,slice_width,slice_height)[sliced_id].tolist()
             # return input_data[sliced_id]
             return json.dumps(array)
@@ -175,7 +175,7 @@ if __name__ == '__main__':
     # 加载配置文件
     print(Path(__file__).parent)
     api_host = os.getenv('HOST', '0.0.0.0')
-    api_port = int(os.getenv('PORT', '5014'))
+    api_port = int(os.getenv('PORT', '5000'))
     # if(input.configfile):
     #     config_path = input.configfile
     #     with open(config_path, 'r') as config_file:

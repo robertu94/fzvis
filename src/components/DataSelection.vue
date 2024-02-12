@@ -8,16 +8,16 @@
     <div id="data_selection">
         <!-- <p>Enter your Configuration here</p> -->
         <input type="file" id="fileloader" @change="handleFileChange" >
-        <t-input id = 'input1' v-model="compressor_id" placeholder='sz' label="compressor_id:"  @enter="update"/>
-        <t-input id = 'input5' v-model="compressor_name" placeholder='sz1' label="compressor_name:"  @enter="update"/>
+        <t-input id = 'input1' v-model="compressor_id" placeholder='sz' label="compressor_id:" />
+        <t-input id = 'input5' v-model="compressor_name" placeholder='sz1' label="compressor_name:"  />
         
         
-        <t-textarea auto-width id = 'input2' v-model="early_config" placeholder='early_config:{"pressio:metric":"composite","composite:plugins": ["time","size","error_stat","external"]}' label="early_config:"  @enter="update"/>
-        <t-textarea  auto-width id = 'input3' v-model="compressor_config" placeholder='compressor_config:{"pressio:abs": 0.001}' label="compressor_config:"  @enter="update"/>
+        <t-textarea auto-width id = 'input2' v-model="early_config" placeholder='early_config:{"pressio:metric":"composite","composite:plugins": ["time","size","error_stat","external"]}' label="early_config:"  />
+        <t-textarea  auto-width id = 'input3' v-model="compressor_config" placeholder='compressor_config:{"pressio:abs": 0.001}' label="compressor_config:"  />
         <!-- <t-input id = 'input4' v-model="input_data" placeholder='/path_to_input_data' label="path_to_input_data:"  @enter="update"/> -->
         <!-- <t-upload ref="uploadRef" id="fileloader" v-model="files"  :requestMethod="requestSuccessMethod"><t-button theme="primary">upload data</t-button>
              </t-upload> -->
-        
+        <button id='update_button' @click="update">submit</button>
         <p id="temp1" ></p>
 
     </div>
@@ -45,11 +45,11 @@ export default {
         host:config.API_HOST,
         port:config.API_PORT,
         loading:false,
-        compressor_id:null,
-        early_config:null,
-        compressor_config:null,
+        compressor_id:'zfp',
+        early_config:'{"pressio:metric":"composite","composite:plugins": ["time","size","error_stat","external"]}',
+        compressor_config:'{"pressio:abs": 0.001}',
         input_data:null,
-        compressor_name:null,
+        compressor_name:'zfp1',
         msg:'',
         compare_data:{'compressor_id':[],'bound':[],'metrics':[],'input_data':''},
       };
@@ -181,8 +181,11 @@ export default {
       // const input = document.getElementById('fileloader');
       const file = event.target.files[0]; // 获取选中的文件
       // const formData = new FormData();
-      
-      _this.formData.append("file", file); // 将文件添加到表单数据中
+      if(_this.formData.has('file')){
+        _this.formData.delete("file");
+      }
+      _this.formData.append("file", file);
+       // 将文件添加到表单数据中
       // _this.fileContent = formData
       // fetch('/upload', { // 假设 '/upload' 是你的后端接口
       //     method: 'POST',
@@ -245,26 +248,44 @@ export default {
             // const that = this
             this.loading = true
             // enter 'http://your_ip:5000/indexlist'
-            console.log(this.fileContent)
-            console.log("http://"+this.host+':'+ String(this.port)+'/indexlist')
-            this.formData.append('compressor_id', this.compressor_id);
-            this.formData.append('early_config', this.early_config);
-            this.formData.append('compressor_config', this.compressor_config);
-            this.formData.append('loaddata',this.loaddata);
-            this.formData.append('slice_id',0)
-            this.formData.compressor_id = this.compressor_id
-            axios.post("http://"+this.host+':'+ String(this.port)+'/indexlist',
-            // {
-                
-            // 'compressor_id':this.compressor_id,
-            // 'early_config':this.early_config,
-            // 'compressor_config':this.compressor_config,
-            // 'input_data':this.fileContent,
-            // 'loaddata':this.loaddata,
-            // 'slice_id':0,
+            // console.log(this.fileContent)
+            // console.log("http://"+this.host+':'+ String(this.port)+'/indexlist')
+            // console.log(this.compressor_config)
+            // console.log(this.formData['compressord_id'])
+            // this.formData['compressord_id'] = this.compressor_id;
+            if(this.formData.has('compressor_id')){
+              this.formData.delete('compressor_id');
+            }
             
-            // }
-            this.formData
+            this.formData.append('compressor_id', this.compressor_id);
+            
+            if(this.formData.has('early_config')){
+              this.formData.delete('early_config');
+            }
+            this.formData.append('early_config', this.early_config);
+            if(this.formData.has('compressor_config')){
+              this.formData.delete('compressor_config');
+            }
+            
+              this.formData.append('compressor_config', this.compressor_config);
+            
+            if(this.formData.has('loaddata')){
+              this.formData.delete('loaddata');
+              
+            }
+            this.formData.append('loaddata', this.loaddata);
+            if(this.formData.has('slice_id')){
+              this.formData.delete('slice_id');
+              
+            }
+            this.formData.append('slice_id', 0);
+            
+            
+            
+            // this.formData.compressor_id = this.compressor_id
+            console.log(this.formData)
+            axios.post("http://"+this.host+':'+ String(this.port)+'/indexlist',
+              this.formData
             ).then(response=>{
                 
                 let need1 = response.data
@@ -276,7 +297,7 @@ export default {
                 document.getElementById('temp1').innerHTML=JSON.stringify(this.compare_data)
                 emitter.emit('myEvent', this.compare_data);
                 this.loading = false
-                this.formData = new FormData()
+                //this.formData = new FormData()
             })
             .catch((error)=>{
                 this.loading = false
@@ -343,5 +364,11 @@ p{
     position: absolute;
     top:19%;
     left:10%;
+}
+#update_button{
+  position: absolute;
+  
+  top:82%;
+  left:85%
 }
 </style>
