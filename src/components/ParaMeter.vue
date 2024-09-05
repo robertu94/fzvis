@@ -520,8 +520,8 @@ export default {
 
 <style scoped>
 #parameter{
-    border:2px solid #a7b2ac;
-    border-radius: 4px;
+    border: 2px solid lightseagreen;
+    border-radius: 10px;
     position:absolute;
     top:1%;
     left:29.3%;

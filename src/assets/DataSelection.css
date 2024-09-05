@@ -1,0 +1,87 @@
+#data_selection {
+    border: 2px solid lightseagreen;
+    border-radius: 10px;
+    position: absolute;
+    top: 1%;
+    left: .7%;
+    width: 99%;
+    height: 26.5%;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 18px;
+    box-sizing: border-box;
+  }
+  .input-group {
+    display: flex;
+    align-items: center;
+    overflow: auto; 
+    gap: 5px; 
+    margin-bottom: 0px; 
+  }
+  .saved-configs {
+    text-align: left;
+    width: 100%;
+    margin-top: -25px;
+    margin-bottom: -5px;
+  }
+  .saved-configs-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 100%;
+  }
+  .button-group {
+    display: flex;
+    gap: 5px;
+  }
+  
+  .button-group2 {
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+    width: 100%;
+    margin-top: 10px;
+  }
+
+  
+  .button-group button {
+    padding: 5px;
+    cursor: pointer;
+    flex: 1;
+  }
+
+  .button-group2 button {
+    height: 50px;
+    padding: 5px;
+    cursor: pointer;
+    flex: 1;
+  }
+  
+  #metric-selection {
+    max-height: 300px;
+    overflow: auto; 
+    transition: max-height 1s;
+    width: 510px;
+  }
+  
+  #metric-selection.closed {
+    max-height: 40px; 
+  }
+
+  .config-window {
+    position: absolute;
+    left: 250px;
+    top: 50px;
+    width: 250px;
+    padding: 20px;
+    border: 5px solid white;
+    background-color: grey;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  }
+  
+  #temp1{
+    display: none;
+}
+  

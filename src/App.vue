@@ -1,7 +1,7 @@
 <template>
-
+  <InputDataset />
   <StatA />
-  <ParaMeter />
+  <!-- <ParaMeter /> -->
   <DataVis />
   <DataSelection />
 </template>
@@ -9,15 +9,17 @@
 <script>
 
 import StatA from './components/StatA.vue'
-import ParaMeter from './components/ParaMeter.vue'
+// import ParaMeter from './components/ParaMeter.vue'
 import DataVis from './components/DataVis.vue'
 import DataSelection from './components/DataSelection.vue'
+import InputDataset from './components/InputDataset.vue'
 export default {
   name: 'App',
   
   components: {
+    InputDataset,
     StatA,
-    ParaMeter,
+    // ParaMeter,
     DataVis,
     DataSelection
   },
