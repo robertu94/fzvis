@@ -254,21 +254,23 @@ methods: {
           axios.post("http://" + this.host + ':' + String(this.port) + '/indexlist', this.formData)
             .then(response => {
               //let need1 = response.data;
-              console.log('C-error part', response.data);
               this.compare_data['compressor_id'].push(this.compressor_id);
-              this.compare_data['bound'].push(response.data['bound']);
+              this.compare_data['bound'].push(response.data['output']['bound']);
               // Ensure you are only pushing the metrics returned from the backend
-              if (response.data['metrics']) {
-                  this.compare_data['metrics'].push(response.data['metrics']);
+              if (response.data['output']['metrics']) {
+                  this.compare_data['metrics'].push(response.data['output']['metrics']);
               } else {
                   console.warn("Metrics returned from the backend are null or undefined.");
               }
 
               //this.compare_data['metrics'].push(response.data['metrics']);
               //this.compare_data['metrics'].push(this.early_config);
-              this.compare_data['input_data'] = this.input_data;
+             this.input_data = response.data['input_data'];
+              console.log(this.input_data)
               document.getElementById('temp1').innerHTML = JSON.stringify(this.compare_data);
               emitter.emit('myEvent', this.compare_data);
+              emitter.emit('inputdata', {"input_data":this.input_data, "width": this.width, "height":this.height, "depth":this.depth});
+              
               this.loading = false;
             })
             .catch((error) => {
@@ -285,7 +287,10 @@ methods: {
     mounted() {
       emitter.on('file-selected', (data) => {
             console.log("datamounted", data);
-            this.formData.append('file', data);
+            this.formData.append('file', data["file"]);
+            this.formData.append('width', data["width"]);
+            this.formData.append('height', data["height"]);
+            this.formData.append('depth', data["depth"]);
 
           });
     },

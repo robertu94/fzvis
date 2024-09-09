@@ -8,12 +8,8 @@
             <canvas id="colorbarCanvas" width="400" height="30"></canvas>
             
             <t-switch id="switch" size="large" v-model="checked" :label="['add point', 'use current points']"></t-switch>
+        
             
-           
-            
-            <t-input id='slice_number' label="slice_number:" v-model="slice_number" placeholder=100 autoWidth/>
-            <t-input id='slice_width' label="slice_width:" v-model="slice_width" placeholder=50 autoWidth/>
-            <t-input id='slice_height' label="slice_height:" v-model="slice_height" placeholder=50 autoWidth/>
             <t-input id='slice_id' label="slice_id:" v-model="slice_id" placeholder=23  @enter="onChange" autoWidth/>
 
             <select id="colormapSelect">
@@ -47,7 +43,7 @@
 import * as d3 from 'd3'
 
 import emitter from './eventBus.js';
-import axios from 'axios'
+// import axios from 'axios'
 import config from '../../config.json';
 export default {
   name:'DataVis',
@@ -57,7 +53,7 @@ export default {
           parameters:'',
           checked:true,
           host:config.API_HOST,
-            port:config.API_PORT,
+          port:config.API_PORT,
           file:[],
           colormap:'',
           canvas:'',
@@ -66,15 +62,15 @@ export default {
           whole_input_data:'',
           value1: null,
           slice_id:null,
-          slice_number:null,
-          slice_width:null,
-          slice_height:null,
+          width:null,
+          height:null,
+          depth:null,
           inputNumberProps: { theme: 'column'},
           svg:'',
           margin:40,
           input_data_path:'',
-          width:(window.innerWidth*0.28)/1.05,
-          height:(window.innerHeight)*0.7/1.05,
+          width1:(window.innerWidth*0.28)/1.05,
+          height1:(window.innerHeight)*0.7/1.05,
           color1: '#FFA500',
           color2: '#006400',
           rects:null,
@@ -84,16 +80,16 @@ export default {
   async mounted(){
     this.canvas = document.getElementById('canvas1');
     this.context = this.canvas.getContext('2d');
-    await emitter.on('myEvent', (data) => {
-        if(this.input_data_path != data['input_data']){
-            this.input_data_path = data['input_data']
-
-            
-            // this.draw()
-        }
+    await emitter.on('inputdata', (data) => {
+        
+        
+        this.width = data['width'];
+        this.height = data['height'];
+        this.depth = data['depth'];
+        this.input_data = Object.values(data["input_data"]);
         
           
-            })
+    })
     
     
   },
@@ -124,13 +120,37 @@ export default {
         }, 100);
 
         const timer = setTimeout(() => {
-          // resolve 参数为关键代码
+          
           resolve({ status: 'success', response: { url: 'https://tdesign.gtimg.com/site/avatar.jpg' } });
 
           clearTimeout(timer);
           clearInterval(percentTimer);
         }, 800);
       });
+    },
+
+    convertTo3DArray(arr, x, y, z) {
+    if (arr.length !== x * y * z) {
+        console.log(arr.length, x, y, z);
+        throw new Error('The size of the input array does not match the specified dimensions.');
+    }
+
+    const array3D = [];
+    let index = 0;
+
+    for (let i = 0; i < x; i++) {
+        const array2D = [];
+        for (let j = 0; j < y; j++) {
+            const array1D = [];
+            for (let k = 0; k < z; k++) {
+                array1D.push(arr[index++]); // 将一维数组的元素逐个分配到三维数组中
+            }
+            array2D.push(array1D); // 将二维数组加入到三维数组
+        }
+        array3D.push(array2D); // 将二维数组加入到三维数组
+    }
+
+    return array3D;
     },
     requestFailMethod(file /** UploadFile */) {
       console.log(file);
@@ -143,28 +163,27 @@ export default {
     showMessage(){
         this.loaddata = 1
         
-        axios.post("http://"+this.host+':'+ String(this.port)+'/indexlist',{
+        // axios.post("http://"+this.host+':'+ String(this.port)+'/indexlist',{
                 
-            'loaddata':1,
-            'slice_id':this.slice_id,
-            'slice_number':this.slice_number,
-            'slice_width':this.slice_width,
-            'slice_height':this.slice_height
-            }).then(response=>{
+        //     'loaddata':1,
+        //     'slice_id':this.slice_id,
+        //     'slice_number':this.depth,
+        //     'slice_width':this.width,
+        //     'slice_height':this.height
+        //     }).then(response=>{
                 
-                let need1 = response.data
-                console.log('接受数据',need1)
-                this.input_data=need1
+        //         let need1 = response.data
+        //         this.input_data=need1
                 this.data_vis()
                 this.defaultcolormap()
                 this.draw()
-            })
-            .catch((error)=>{
+            // })
+            // .catch((error)=>{
                 
-                // this.infoMessage = 'illegal input'
-                alert('illegal input');
-                console.log(error)
-            })
+            //     // this.infoMessage = 'illegal input'
+            //     alert('illegal input');
+            //     console.log(error)
+            // })
         
     },
     
@@ -173,25 +192,12 @@ export default {
         
         const that = this
         
-        const path = '"'+this.input_data_path+'"'
-        console.log(path)
-
-        // d3.json(path).then((d)=>{
+        console.log(this.input_data)
         const min1 = d3.min(that.input_data.flat())
         const max1 = d3.max(that.input_data.flat())
+       
         this.input_data = this.input_data.map((d)=>d.map(i=>(i-min1)/(max1-min1)))
             
-            // this.canvas.width = 200;
-            // this.canvas.height = 200;
-            // this.canvas.id = 'canvas1'
-            // document.body.appendChild(this.canvas);
-            
-            // document.getElemntById("#dataCanvas").setAttribute("width","75px")
-            
-            // this.draw(min,max,q1,q2,q3)
-            // console.log(min,max,q1,q2,q3)
-            
-        // })
 
         
     },
@@ -296,10 +302,6 @@ export default {
             return data.map(row => row.map(value => interpolateColor(value)));
         }
 
-        // 创建一个canvas元素来绘制映射结果
-
-
-        // 绘制数据映射结果
         function drawData(data) {
             const colorData = mapDataToColor(data);
             var blockSize = canvas.width/(colorData[0].length)
@@ -317,9 +319,7 @@ export default {
             
         }
         drawData(data);
-// 开始绘制
 
-// 获取colorbar的canvas元素
         const colorbarCanvas = document.getElementById('colorbarCanvas');
         const colorbarContext = colorbarCanvas.getContext('2d');
         const colorbarWidth = 350; // colorbar的宽度
@@ -389,7 +389,7 @@ export default {
                 
                 const y = colorbarHeight / 2 - 3.5;
                 
-                // 绘制小圆表示控制点
+                
                 colorbarContext.beginPath();
                 const text = point.label; // 要显示的文字
                 // console.log(point)
@@ -403,11 +403,7 @@ export default {
             // drawColorbar();
         }
 
-        // // 在colorbar上绘制控制点
-        // drawColorbar();
-        // drawControlPoints();
-
-        // 在colorbar上绘制控制点
+        
         drawColorbar();
         drawControlPoints();
 
@@ -452,9 +448,9 @@ export default {
             
 
 
-        // 检查点击位置是否在色条的垂直中心区域，您可以根据需要调整y坐标的检测范围
+        
         if (clickY > colorbarHeight / 2 - 10 && clickY < colorbarHeight / 2 + 10) {
-            // 创建一个新的圆形数据对象
+
             const value = (clickX/colorbarWidth)*255
             const lista = colorControlPoints.map((d)=>d.value)
             lista.push(value)
@@ -468,24 +464,22 @@ export default {
             const newPoint = {
                 value: value,
                 
-                radius: 7, // 圆的半径，可以根据需要进行调整
-                color: {r: r, g: g, b: b} // 圆的颜色，可以根据需要进行调整
+                radius: 7, 
+                color: {r: r, g: g, b: b} 
             };
 
-            // 将新的圆形数据对象添加到数组中
+            
             if (value>0 && value<=255){
                 colorControlPoints.push(newPoint)
             }
                 
             
             
-            // console.log(colorControlPoints)
-            // 重绘色条和所有圆形
-            // drawColorbar(); // 假设这是您绘制色条背景的函数
+            
             context.clearRect(0, 0, canvas.width, canvas.height);
             drawColorbar()
             drawControlPoints();
-            redrawDataVisualization(); // 这是绘制所有控制点圆形的函数
+            redrawDataVisualization(); 
         }
 
             }
@@ -510,19 +504,16 @@ export default {
                 selectedControlPoint = null;
             });
         colorbarCanvas.addEventListener('dblclick',onCanvasDblClick)
-        // ...
-
-        // 重新绘制数据可视化结果
+        
         function redrawDataVisualization() {
-            // 获取新的数据映射
+            
             const colorData = mapDataToColor(data);
 
-            // 清空canvas
+            
             var blockSize = canvas.width/(colorData[0].length)
             var blockSize1 = canvas.height/(colorData.length)
             context.clearRect(0, 0, canvas.width, canvas.height);
 
-            // 绘制新的数据映射
             for (let i = 0; i < colorData.length; i++) {
                 for (let j = 0; j < colorData[i].length; j++) {
                     const color = colorData[i][j];
@@ -532,13 +523,13 @@ export default {
             }
         }
 
-        // 初始化数据可视化
+       
         function initVisualization() {
-            // 绘制数据映射结果
+            
             drawData(data);
         }
 
-        // 初始化
+        
         initVisualization();
 
             },
@@ -554,8 +545,7 @@ export default {
         };
         const selectedColormap = colormapSelect.value;
     if (defaultColormaps[selectedColormap]) {
-        // 应用选择的默认colormap
-        // console.log(defaultColormaps[selectedColormap].split(', ').slice(1,-1))
+        
         this.colormap = defaultColormaps[selectedColormap].split(', ').slice(1,-1)
         this.draw()
     }
@@ -581,12 +571,10 @@ export default {
         colormapSelect.appendChild(option);
     }
 
-// 默认colormap选择事件监听器
+
 colormapSelect.addEventListener('change', () => {
     const selectedColormap = colormapSelect.value;
     if (defaultColormaps[selectedColormap]) {
-        // 应用选择的默认colormap
-        // console.log(defaultColormaps[selectedColormap].split(', ').slice(1,-1))
         this.colormap = defaultColormaps[selectedColormap].split(', ').slice(1,-1)
         this.draw()
     }
@@ -705,25 +693,7 @@ colormapSelect.addEventListener('change', () => {
     left:30%;
     z-index:101
 }
-#slice_number{
-    position: absolute;
-    top:10%;
-    left:2%;
-    z-index:101
 
-}
-#slice_width{
-    position: absolute;
-    top:10%;
-    left:37%;
-    z-index:101
-}
-#slice_height{
-    position: absolute;
-    top:10%;
-    left:68%;
-    z-index:101
-}
 #fileloader{
     position: absolute;
     top:2%;
