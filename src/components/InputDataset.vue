@@ -3,10 +3,10 @@
       <div id="input-dataset-container">
       <h3>Upload Input Dataset</h3>
       <input type="file" id="fileloader" @change="handleFileChange">
-      <t-input id='width' label="width:" v-model="width" placeholder=500 />
-      <t-input id='height' label="height:" v-model="height" placeholder=500 />
-      <t-input id='depth' label="depth:" v-model="depth" placeholder=1 />
-      <p v-if="fileContent">File Loaded: {{ fileContent }}</p>
+      <!-- <t-input id='width' label="width:" v-model="width" placeholder=500 @input="emitFileData"/>
+      <t-input id='height' label="height:" v-model="height" placeholder=500 @input="emitFileData"/>
+      <t-input id='depth' label="depth:" v-model="depth" placeholder=1 @input="emitFileData"/> -->
+      <h6 v-if="fileContent">File Loaded: {{ fileContent }}</h6>
       </div>
   </div>
 </template>
@@ -38,10 +38,24 @@ handleFileChange(event){
   this.formData.append("file", file);
   this.fileContent = file.name;
   console.log(this.fileContent)
+  this.file = file;
   console.log(this.width)
-  emitter.emit('file-selected', {"file": file, "width": this.width, "height": this.height, "depth":this.depth});
+  this.emitFileData();
+  // emitter.emit('file-selected', {"file": file, "width": this.width, "height": this.height, "depth":this.depth});
   
 },
+
+emitFileData() {
+      if (this.file) {
+        console.log("Emitting file data:", this.fileContent);
+        emitter.emit('file-selected', {
+          file: this.file,
+          // width: this.width,
+          // height: this.height,
+          // depth: this.depth
+        });
+      }
+    },
 
 requestSuccessMethod(file /* UploadFile */) {
   console.log(file, file.raw);
@@ -88,7 +102,7 @@ watch: {
 };
 </script>
 
-<style>
+<!-- <style>
 #depth{
 position: absolute;
 top:60%;
@@ -111,4 +125,5 @@ left:38%;
 z-index:101;
 width: 20%
 }
-</style>
+</style> -->
+

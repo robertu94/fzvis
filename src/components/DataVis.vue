@@ -12,31 +12,16 @@
             
             <t-input id='slice_id' label="slice_id:" v-model="slice_id" placeholder=23  @enter="onChange" autoWidth/>
 
-            <select id="colormapSelect">
-        
-</select>
+            <select id="colormapSelect"></select>
 
-        
-        <svg id="data_svg">
-
-        </svg>
-        
-        <!-- <t-slider id ='slider' v-model="value1" :show-tooltip="true" :inputNumberProps="inputNumberProps" v-on:change="update"/> -->
-        
-
-        <!-- color -->
-        <!-- <t-space id='color' size="5px">
-        <t-space direction="vertical" size="5px" class="item">
-            
-            <t-color-picker v-model="color1" format="HEX" :color-modes="['monochrome']" v-on:change="update"/>
-        </t-space>
-        <t-space direction="vertical" size="5px" class="item">
-            
-            <t-color-picker v-model="color2" format="HEX" :color-modes="['monochrome']" v-on:change="update"/>
-        </t-space>
-        </t-space> -->
-
+            <svg id="data_svg"></svg>
+            <div id="whd" class="input-section">
+            <t-input id='width' label="width:" v-model="width" placeholder=500 @input="emitFileData" class="input-field"/>
+            <t-input id='height' label="height:" v-model="height" placeholder=500 @input="emitFileData" class="input-field"/>
+            <t-input id='depth' label="depth:" v-model="depth" placeholder=1 @input="emitFileData" class="input-field"/>
+        </div>
     </div>
+
 </template>
 
 <script>
@@ -54,7 +39,8 @@ export default {
           checked:true,
           host:config.API_HOST,
           port:config.API_PORT,
-          file:[],
+          //file:[],
+          file: null,
           colormap:'',
           canvas:'',
           context:'',
@@ -105,6 +91,37 @@ export default {
     },
   },
   methods:{
+
+    //new parts
+    // handleFileChange(event) {
+    //   const file = event.target.files[0];
+    //   this.file = file;
+    //   this.emitFileData(); // Call emitFileData when file changes
+    // },
+
+    // emitDimensions() {
+    //   if (this.width && this.height && this.depth) {
+    //     console.log('Emitting dimension:', this.width, this.height, this.depth);
+    //     emitter.emit('dimensions-updated', {
+    //     //   file: this.file,
+    //       width: this.width,
+    //       height: this.height,
+    //       depth: this.depth,
+    //     });
+    //   }
+    // },
+    emitFileData() {
+      if ( this.width && this.height && this.depth) {
+        console.log("Emitting file data:", this.fileContent, this.width, this.height, this.depth);
+        emitter.emit('file-selected', {
+          //file: this.file,
+          width: this.width,
+          height: this.height,
+          depth: this.depth
+        });
+      }
+    },
+
     requestSuccessMethod(file /** UploadFile */) {
       console.log(file, file.raw);
       return new Promise((resolve) => {
@@ -163,27 +180,9 @@ export default {
     showMessage(){
         this.loaddata = 1
         
-        // axios.post("http://"+this.host+':'+ String(this.port)+'/indexlist',{
-                
-        //     'loaddata':1,
-        //     'slice_id':this.slice_id,
-        //     'slice_number':this.depth,
-        //     'slice_width':this.width,
-        //     'slice_height':this.height
-        //     }).then(response=>{
-                
-        //         let need1 = response.data
-        //         this.input_data=need1
                 this.data_vis()
                 this.defaultcolormap()
                 this.draw()
-            // })
-            // .catch((error)=>{
-                
-            //     // this.infoMessage = 'illegal input'
-            //     alert('illegal input');
-            //     console.log(error)
-            // })
         
     },
     
@@ -603,7 +602,17 @@ colormapSelect.addEventListener('change', () => {
     left:.7%;
     width: 28%;
     height: 58%;
-    background-color:'lightgrey'
+    background-color:'lightgrey';
+}
+.input-section {
+  margin-top: 43px;
+  gap: 10px; /* Add space between the textboxes */
+  display: flex;
+  position: absolute;
+}
+
+.input-field {
+    max-width: 150px;
 }
 #data_svg{
     position: absolute;
@@ -619,7 +628,7 @@ colormapSelect.addEventListener('change', () => {
 #switch{
     position: absolute;
     top:3%;
-    left:71%;
+    left:80%;
     z-index:101
 }
 #color{
@@ -653,7 +662,7 @@ colormapSelect.addEventListener('change', () => {
 #file{
     position:absolute;
     top:3%;
-    left:55%
+    left:59%
 }
 #colormapSelect{
     position:absolute;

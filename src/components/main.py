@@ -106,7 +106,7 @@ def indexlist():
 parser = ArgumentParser(description="enter your HOST/POST.", usage="path/to/main.py [OPTIONAL ARGUMENTS] <HOST> <PORT> <configfile>")
 
 parser.add_argument('--HOST', nargs='?', help='HOST_address', default="localhost")
-parser.add_argument('--PORT', nargs='?', help='PORT_address', default="5000")
+parser.add_argument('--PORT', nargs='?', help='PORT_address', default="5001")
 
 parser.add_argument('--configfile', nargs='?', help='your_config_file', default=None)   
 
@@ -129,4 +129,5 @@ if __name__ == '__main__':
     with open('./config.json', 'w') as json_file:
         json.dump(config, json_file, indent=4)
     app.run(host=api_host, port = api_port, debug=True)
+
 
