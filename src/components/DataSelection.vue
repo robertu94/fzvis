@@ -276,6 +276,7 @@ methods: {
             this.formData.append('width', data["width"]);
             this.formData.append('height', data["height"]);
             this.formData.append('depth', data["depth"]);
+            this.formData.append('precision', data["precision"]);
 
           });
     },

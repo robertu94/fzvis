@@ -19,6 +19,7 @@
             <t-input id='width' label="width:" v-model="width" placeholder=500 @input="emitFileData" class="input-field"/>
             <t-input id='height' label="height:" v-model="height" placeholder=500 @input="emitFileData" class="input-field"/>
             <t-input id='depth' label="depth:" v-model="depth" placeholder=1 @input="emitFileData" class="input-field"/>
+            <t-input id='precision' label="precision:" v-model="precision" placeholder="d" @input="emitFileData" class="input-field"/>
         </div>
     </div>
 
@@ -51,9 +52,11 @@ export default {
           width:null,
           height:null,
           depth:null,
+          precision:null,
           inputNumberProps: { theme: 'column'},
           svg:'',
           margin:40,
+          input_data:null,
           input_data_path:'',
           width1:(window.innerWidth*0.28)/1.05,
           height1:(window.innerHeight)*0.7/1.05,
@@ -72,8 +75,9 @@ export default {
         this.width = data['width'];
         this.height = data['height'];
         this.depth = data['depth'];
-        this.input_data = Object.values(data["input_data"]);
-        
+        console.log(Object.values(JSON.parse(JSON.stringify(data['input_data']))))
+        this.input_data = data['input_data'];
+        console.log(Array.isArray(this.input_data))
           
     })
     
@@ -111,13 +115,14 @@ export default {
     //   }
     // },
     emitFileData() {
-      if ( this.width && this.height && this.depth) {
+      if ( this.width && this.height && this.depth && this.precision) {
         console.log("Emitting file data:", this.fileContent, this.width, this.height, this.depth);
         emitter.emit('file-selected', {
           //file: this.file,
           width: this.width,
           height: this.height,
-          depth: this.depth
+          depth: this.depth,
+          precision: this.precision
         });
       }
     },
@@ -180,44 +185,68 @@ export default {
     showMessage(){
         this.loaddata = 1
         
-                this.data_vis()
-                this.defaultcolormap()
-                this.draw()
-        
+        this.data_vis()
+        this.defaultcolormap()
+        this.draw()
+
     },
     
     data_vis:function(){
 
         
-        const that = this
-        
-        console.log(this.input_data)
-        const min1 = d3.min(that.input_data.flat())
-        const max1 = d3.max(that.input_data.flat())
-       
-        this.input_data = this.input_data.map((d)=>d.map(i=>(i-min1)/(max1-min1)))
+        const that = this;
+
+        // 优化的递归函数，将多维数组展平为一维数组
+        const flattenArray = (arr) => {
+            return arr.reduce((acc, val) => acc.concat(Array.isArray(val) ? flattenArray(val) : val), []);
+        };
+
+        // 使用 D3 找到数组中的最小值和最大值
+        const min1 = d3.min(flattenArray(that.input_data));
+        const max1 = d3.max(flattenArray(that.input_data));
+
+        console.log(min1, max1);
+
+        // 使用递归方法对三维数组进行归一化处理
+        const normalizeArray = (arr, min, max) => {
+            return arr.map(d => Array.isArray(d) ? normalizeArray(d, min, max) : (d - min) / (max - min));
+        };
+
+        // 更新归一化后的数据
+        this.input_data = normalizeArray(this.input_data, min1, max1);
             
 
         
     },
     draw:function(){
         // console.log(document.getElementById('input4').value)
-        function calculatePercentile(array, percentile) {
-            const sortedArray = array.flat().sort((a, b) => a - b);
-            const index = Math.floor((percentile / 100) * sortedArray.length);
-            return sortedArray[index];
-        }
+        
         const that = this
         // 假设这是你的100x100数组
         const canvas = that.canvas
         const context = that.context
         const data = that.input_data;
+        
+        const flattenArray = (arr) => {
+            return arr.reduce((acc, val) => acc.concat(Array.isArray(val) ? flattenArray(val) : val), []);
+        };
 
-        const min = d3.min(that.input_data.flat())
-        const max = d3.max(that.input_data.flat())
-        const q1 = calculatePercentile(that.input_data.flat(), 25);
-        const q2 = calculatePercentile(that.input_data.flat(), 50);
-        const q3 = calculatePercentile(that.input_data.flat(), 75);
+        // 将三维数组展平为一维数组
+        const flatData = flattenArray(that.input_data);
+
+        // 计算最小值、最大值
+        const min = d3.min(flatData);
+        const max = d3.max(flatData);
+
+        // 为计算分位数排序数组
+        const sortedData = flatData.sort((a, b) => a - b);
+
+        // 计算 25%、50%（中位数）、75%的分位数
+        const q1 = d3.quantile(sortedData, 0.25);
+        const q2 = d3.quantile(sortedData, 0.5);  // 中位数
+        const q3 = d3.quantile(sortedData, 0.75);
+
+        console.log(min, max, q1, q2, q3)
 
         function hexToRgb(hex) {
             // 去掉可能包含的 '#' 符号

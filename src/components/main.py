@@ -75,11 +75,18 @@ def indexlist():
             loaddata = 1
         print(loaddata)
         if loaddata==0:
+            print(request.form)
             file = request.files['file']
             width = int(request.form['width'])
             height = int(request.form['height'])
             depth = int(request.form['depth'])
-            input_data = np.load(file).reshape(width, height, depth)
+            precision = request.form.get('precision')
+            print(precision)
+            if precision=='d': 
+                input_data = np.fromfile(file, dtype=np.float64).reshape(width, height, depth)
+            elif precision=='f': 
+                input_data = np.fromfile(file, dtype=np.float32).reshape(width, height, depth)
+            
             
             # compressor_id = request.form['compressor_id']
             # early_config = json.loads(request.form.get('early_config'))
