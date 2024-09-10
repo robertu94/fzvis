@@ -33,8 +33,7 @@ def indexlist():
             return obj
     def comparing_compressor(arguments):
         global  input_data, width, depth, height
-        input_data = arguments['input_data']
-        print(len(input_data))
+        print("arguments: ", arguments)
         configs = {
             "compressor_id": arguments["compressor_id"],
             "early_config": arguments["early_config"],
@@ -61,7 +60,7 @@ def indexlist():
             #return {'compressor_id': configs["compressor_id"], 'bound': configs['bound'], 'metrics': metrics1}
             return {
                 "compressor_id": args['compressor_id'],
-                "bound": args['bound'],
+                "bound": args["bound"],
                 "metrics": metrics1
             }
         result = run_compressor(configs)
@@ -82,18 +81,27 @@ def indexlist():
             depth = int(request.form['depth'])
             input_data = np.load(file).reshape(width, height, depth)
             
-            compressor_id = request.form['compressor_id']
-            early_config = json.loads(request.form.get('early_config'))
-            compressor_config = json.loads(request.form.get('compressor_config'))
-            configration = {'compressor_id':compressor_id, 
-                            'early_config':early_config,
-                            'compressor_config':compressor_config,
-                            'input_data':input_data
-                            }
-            print(configration)
-            print("Received early_config:", early_config)
-            output = comparing_compressor(configration)
-            result = {"output": output, "input_data":input_data.tolist()}
+            # compressor_id = request.form['compressor_id']
+            # early_config = json.loads(request.form.get('early_config'))
+            # compressor_config = json.loads(request.form.get('compressor_config'))
+            # configration = {'compressor_id':compressor_id, 
+            #                 'early_config':early_config,
+            #                 'compressor_config':compressor_config,
+            #                 'input_data':input_data
+            #                 }
+            configurations = json.loads(request.form.get('configurations'))
+            print(configurations)
+            result = {}
+            for key in configurations:
+                if(configurations[key]['compressor_id']!=''):
+                
+                    print(key)
+                    output = comparing_compressor(configurations[key])
+                    result_tmp = {"output": output, "input_data":input_data.tolist()}
+                    result["compressor_" + key] = output
+                    print(result)
+            result['input_data'] = input_data.tolist()
+            
             #return json.loads(json.dumps(output,indent=2))
             return result
         else: 

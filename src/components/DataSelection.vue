@@ -57,6 +57,7 @@ data(){
       port:config.API_PORT,
       loading:false,
       compressor_id:'',
+      num_compressors:0,
       bound:null,
       input_data:null,
       selectedFile: null,
@@ -69,11 +70,11 @@ data(){
       { label: 'MGARD', value: 'mgard' },
       ],
       selectedMetrics: [],
-      savedConfigurations: [
-          { compressor_id: '', early_config: {}, compressor_config: {} },
-          { compressor_id: '', early_config: {}, compressor_config: {} },
-          { compressor_id: '', early_config: {}, compressor_config: {} }
-        ],
+      savedConfigurations: {
+        '0':{ compressor_id: '', early_config: {}, compressor_config: {} },
+        '1':{ compressor_id: '', early_config: {}, compressor_config: {} },
+        '2':{ compressor_id: '', early_config: {}, compressor_config: {} }
+      },
       selectedSaveSlot: null,
       showConfigWindow: false,
       compressorMetrics: [
@@ -148,7 +149,7 @@ computed: {
 },
 methods: {
     saveConfiguration() {
-        for (let i = 0; i < this.savedConfigurations.length; i++) {
+        for (let i = 0; i < 3; i++) {
           if (this.savedConfigurations[i].compressor_id === '') {
             this.selectedSaveSlot = i;
   
@@ -219,54 +220,38 @@ methods: {
           console.log('Bound:', this.bound);
           console.log('Early Config:', early_config);
           console.log('Compressor Config:', compressor_config);
-          // if(this.formData.has('compressor_id')){
-          //     this.formData.delete('compressor_id');
-          //   }
-          this.formData.append('compressor_id', "sz");
           
-          this.formData.append('early_config', JSON.stringify(early_config));
-          this.formData.append('compressor_config', JSON.stringify(compressor_config));
-          this.formData.append('bound', this.bound);
+          
           this.formData.append('loaddata', this.loaddata);
           this.formData.append('slice_id', 0);
-          // // this.formData.append('file', input_data);
-          // console.log('Compressor ID1:', this.compressor_id);
-          // console.log('Bound1:', this.bound);
-          // console.log('Early Config1:', rawEarlyConfig);
-          // console.log('Compressor Config1:', rawCompressorConfig);
-          console.log("data transfer");
-          // emitter.on('file-selected', (data) => {
-          //   console.log("data", data);
-          //   this.formData.append('file', data);
-
-          // });
           
-          // Append the file to formData
-          // if (this.selectedFile) {
-          //   this.formData.append('file', this.selectedFile);
-          // } else {
-          //   this.loading = false;
-          //   console.log("exist");
-          //   return;
-          // }
-  
+          console.log("data transfer");
+          
+          if(this.formData.has("configurations")){
+              this.formData.delete("configurations");
+            }
+          this.formData.append("configurations",JSON.stringify(this.savedConfigurations));
           console.log('FormData before submission:', [...this.formData]);
           axios.post("http://" + this.host + ':' + String(this.port) + '/indexlist', this.formData)
             .then(response => {
               //let need1 = response.data;
-              this.compare_data['compressor_id'].push(this.compressor_id);
-              this.compare_data['bound'].push(response.data['output']['bound']);
-              // Ensure you are only pushing the metrics returned from the backend
-              if (response.data['output']['metrics']) {
-                  this.compare_data['metrics'].push(response.data['output']['metrics']);
-              } else {
-                  console.warn("Metrics returned from the backend are null or undefined.");
+              
+              for(const key in response.data)
+              {
+                let element = response.data[key]
+                
+                if(key=='input_data') continue;
+                this.compare_data['compressor_id'].push(key);
+                this.compare_data['bound'].push(element['bound']);
+                if (element['metrics']) {
+                  this.compare_data['metrics'].push(element['metrics']);
+                } else {
+                    console.warn("Metrics returned from the backend are null or undefined.");
+                }
               }
-
-              //this.compare_data['metrics'].push(response.data['metrics']);
-              //this.compare_data['metrics'].push(this.early_config);
-             this.input_data = response.data['input_data'];
-              console.log(this.input_data)
+              
+              this.input_data = response.data['input_data']
+              
               document.getElementById('temp1').innerHTML = JSON.stringify(this.compare_data);
               emitter.emit('myEvent', this.compare_data);
               emitter.emit('inputdata', {"input_data":this.input_data, "width": this.width, "height":this.height, "depth":this.depth});
