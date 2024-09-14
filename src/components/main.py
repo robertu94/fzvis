@@ -34,9 +34,33 @@ def indexlist():
     def comparing_compressor(arguments):
         global  input_data, width, depth, height
         print("arguments: ", arguments)
+        # # if 'composite:plugins' in arguments['early_config'] and not arguments['early_config']['composite:plugins']:
+        # #     print("No composite plugins found, skipping processing for this configuration.")
+        # # return {"error": "No valid composite plugins provided"}
+        # configs = {
+        #     "compressor_id": arguments["compressor_id"],
+        #     "early_config": arguments["early_config"],
+        #     "compressor_config": arguments["compressor_config"],
+        #     "bound": arguments["compressor_config"]["pressio:abs"]
+        # }
+        # Dynamically handle different metric selections
+        def get_metrics_configuration(metrics):
+            if 'composite' in metrics:
+                # If composite is selected, use all metrics
+                return {
+                    "pressio:metric": "composite",
+                    "composite:plugins": ["time", "size", "error_stat"]
+                }
+            else:
+                # Otherwise, only use the selected metrics
+                return {
+                    "pressio:metric": "composite",
+                    "composite:plugins": metrics
+                }
+
         configs = {
             "compressor_id": arguments["compressor_id"],
-            "early_config": arguments["early_config"],
+            "early_config": get_metrics_configuration(arguments['early_config'].get("composite:plugins", [])),
             "compressor_config": arguments["compressor_config"],
             "bound": arguments["compressor_config"]["pressio:abs"]
         }
@@ -47,6 +71,10 @@ def indexlist():
             compressor = libpressio.PressioCompressor.from_config({
                 "compressor_id": args['compressor_id'],
                 "early_config": args['early_config'],
+                # "early_config": {
+                #     "pressio:metric": "composite",
+                #     "composite:plugins": ["time", "size", "error_stat"],
+                # },
                 "compressor_config": args['compressor_config']
             })
             decomp_data = input_data.copy()
@@ -75,7 +103,6 @@ def indexlist():
             loaddata = 1
         print(loaddata)
         if loaddata==0:
-            print(request.form)
             file = request.files['file']
             width = int(request.form['width'])
             height = int(request.form['height'])
@@ -86,7 +113,7 @@ def indexlist():
                 input_data = np.fromfile(file, dtype=np.float64).reshape(width, height, depth)
             elif precision=='f': 
                 input_data = np.fromfile(file, dtype=np.float32).reshape(width, height, depth)
-            
+            # input_data = np.load(file).reshape(width, height, depth)
             
             # compressor_id = request.form['compressor_id']
             # early_config = json.loads(request.form.get('early_config'))
@@ -144,5 +171,3 @@ if __name__ == '__main__':
     with open('./config.json', 'w') as json_file:
         json.dump(config, json_file, indent=4)
     app.run(host=api_host, port = api_port, debug=True)
-
-

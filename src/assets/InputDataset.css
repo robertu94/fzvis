@@ -5,8 +5,8 @@
   top: 28%;
   left: .7%;
   padding: 9px;
-  width: 28%;
-  height: 11.5%;
+  width: 28.25%;
+  height: 19.5%;
   text-align: left;
   display: flex;
   flex-direction: column;
@@ -29,4 +29,18 @@ h3 {
   font-size: 21.5px; 
 }
 
+.input-section {
+  margin-top: 140px;
+  gap: 7px; /* Add space between the textboxes */
+  display: flex;
+  position: absolute;
+}
+
+.input-field {
+    max-width: 95px;
+}
+
+.input-fielddepth {
+  max-width: 80px;
+}
 

@@ -73,8 +73,10 @@
                                 }
                 },
                 title: {
+                    // text: '广东省每日确诊和累计出院人数变化趋势',
                     top:20,
                     left: 'center',
+                    
                     textStyle:{
                         fontSize: 25
                     }
@@ -110,7 +112,12 @@
                         type: 'value'
                     }
                 ],
-                
+                // angleAxis: {
+                //     type: 'category',
+                //     data: ''
+                // },
+                // radiusAxis: {},
+                // polar: {},
                 
                 series: '',
                 legend: {
@@ -141,16 +148,22 @@
                 for(let i =0;i<size;i++){
                     
                     data['metrics'][i]['compressor_id'] = data['compressor_id'][i]
-                    
+                    // q.push(data['compressor_id'][i])
                     
                     temp.push(data['metrics'][i])
                 }
                 this.parameters = temp
+                // this.draw_levels()
                 if(!this.myChart == null) {
                 this.myChart.dispose()
                 this.myChart = null
             }
-            }); 
+
+
+            // 处理接收到的数据
+            });
+        
+        
     },
     computed: {
     },
@@ -158,13 +171,6 @@
        
         draw_levels:function(){
             
-            const parameters = Array.isArray(this.parameters) ? this.parameters : [];
-
-            if (parameters.length === 0) {
-                console.warn("No parameters available to process.");
-                return; // Exit the function early if there are no parameters to process
-            }
-
             function normalize(data) {
                 const max = Math.max(...data);
                 const min = Math.min(...data);
@@ -172,11 +178,14 @@
                 return min==max?data.map((d)=>0.5*d/d):data.map(value => (value - min) / (max - min))
             }
             const that = this
-            if (!parameters[0] || !Object.keys(parameters[0])) {
-                console.error("parameters[0] or its keys are undefined.");
-                return; // Exit the function if parameters[0] is undefined
-            }
-            /*const parameters = this.parameters*/
+            const parameters = this.parameters
+
+            
+            //     let index
+            //     index =  parseInt(i/2)
+            //     console.log(index)
+            //     item.compressor_id+='_'+String(index)
+            // })
             this.name = Array.from(new Set(parameters.map(item=>item['compressor_id']))).map((item)=>{
                 return {
                     value:item,
@@ -187,10 +196,12 @@
             })
             
             this.option.xAxis[0].data = this.name
+            // this.option.angleAxis.data = parameters.map(item=>Object.keys(item))[0].filter(d=>d!='compressor_id').map(d=>d.split(':')[1])
             let series = []
             
             that.stats = parameters.map(item=>Object.keys(item))[0].filter(d=>d!='compressor_id').map(d=>d.split(':')[1])
-        
+            
+
             let selected = {}
             let record = {}
             this.name.forEach((i)=>{
@@ -198,9 +209,13 @@
             })
             
             that.stats.forEach((item,i)=>{
-            
+                // console.log(Object.keys(parameters[0]))
+                // console.log(parameters.map((j)=>j[Object.keys(parameters[0])[i+1]]),)
+                // console.log(Object.values(parameters[0]).filter((item,j)=>Object.keys(parameters[0])[j]!='compressor_id'))
                 const u = normalize(parameters.filter(item=>Object.keys(item)!='compressor_id').map((j)=>j[Object.keys(parameters[0])[i]]).map(item=>parseFloat(item)))
             
+                // record.push(m)
+                // console.log('v',parameters.map((j)=>j[Object.keys(parameters[0])[i+1]]).map(item=>parseFloat(item)))
                 if(!u.includes(NaN)){
                 
                 this.doubleclick[item] = 0
@@ -217,14 +232,18 @@
                     itemStyle: {
 							normal: {
 								label: {
-									show: true, 
-									position: 'top', 
-									textStyle: { 
+									show: true, //开启显示
+									position: 'top', //在上方显示
+									textStyle: { //数值样式
 										color: 'black',
 										fontSize: 2
 									}
 								}
 							}}
+                    // stack: 'a',
+                    // emphasis: {
+                    //     focus: 'series'
+                    // }
                     }
                 series.push(obj)
                 selected.item=false
@@ -248,9 +267,16 @@
             })
     
             this.option.legend.selected = selected
+            // const that = this
+            // let width = (window.innerWidth*0.7)/1.05;
+            // let height = (window.innerHeight)*0.6/1.05;
             
             this.option.tooltip.formatter = function (params) {
+                    // const that = this
                     var htmlStr = '';
+                    
+                    // const idx = params[0].axisIndex
+                    // console.log(params)
                     for(var i=0;i<params.length;i++){
                         
                         var param = params[i];
@@ -301,6 +327,18 @@
                         that.checked_c = that.checked_c.filter(item=>item!=params.value)
                     }
                     console.log(that.checked_c,that.name)
+                    // const yAxisName = params.value
+                    // const yAxisItem = {
+                    // value: yAxisName,
+                    // textStyle: {
+                    //     color: '#00ff7f'
+                    // }
+                    // }
+
+                    // const index = name.findIndex(item => {
+                    //     return that.checked_c.includes(item)
+                    // })
+                    // console.log(index)
                     that.name.forEach((item,i)=>{
                         // console.log(item)
                         if(that.checked_c.includes(item.value)){
@@ -313,11 +351,22 @@
                                     'black'
                         }
                     })
+                    // that.checked_c.forEach((q)=>{
+                    //     // console.log(q)
+                    //     name[q].textStyle = {
+                    //     color: '#00ff7f'
+                    // }
+                    // })
+                    // name.splice(index, 1, yAxisItem)
+                    // console.log(that.name)
                     option.xAxis.data = JSON.parse(JSON.stringify(that.name))
                     myChart.setOption(option)
 
+                    
+                    // console.log(option.xAxis[0].textStyle.color)
                 }
             })
+            // console.log(option.tooltip)
             myChart.on('legendselectchanged', function(params) {
                 
                 let option = this.getOption();
@@ -327,10 +376,11 @@
                 
                 select_value.forEach((item,i)=>{
                     if(params.name==select_key[i]){
-
+                        // let n = that.stats.indexOf(params.name)
                         option.legend[0].selected[select_key[i]] = !that.doubleclick[select_key[i]]
                         that.doubleclick[select_key[i]] = !that.doubleclick[select_key[i]]
-
+                        
+                        // option.series[n].barWidth='5%'
                     }
                     else{
                         option.legend[0].selected[select_key[i]] = that.doubleclick[select_key[i]]
@@ -343,7 +393,16 @@
                         option.series[i].barWidth=1
                     })
                 }
-
+                // else{
+                //     // const m = temp.filter(item=>item==true).length
+                //     const length = '5%'
+                //     temp.forEach((item,i)=>{
+                //         if(item){
+                //             option.series[i].barWidth=length
+                //         }
+                        
+                //     })
+                // }
                 this.setOption(option)
                 
                 myChart.setOption(option,true);
@@ -353,6 +412,7 @@
             
         },
         draw:function(){
+            // const data = document.getElementById('temp1').innerHTML
             
             this.checked_c = []
             if(!this.myChart == null) {
@@ -375,13 +435,16 @@
                 }
                 return color
             }
+            // this.compare_mode = !this.compare_mode
             
             let data1 = data.filter(item=>this.checked_c.includes(item.compressor_id))
             
+            // console.log(data1)
             const svg = this.svg
             let width = (document.getElementById('stat').clientWidth*0.8)
             let height = (document.getElementById('stat').clientHeight*0.8)
             let margin = 40;
+            // console.log(document.getElementById('stat').clientHeight)
 
             let species = this.checked_c;
             let group = svg.append("g");
@@ -389,8 +452,14 @@
 
             let dimensions = Object.keys(data1[0]).filter(item=>item!='compressor_id' && typeof(data1[0][item])!='string' && data1[0][item]!=null)
             
+            
+            // console.log(data.map(d=>d['compressor_id']))
+            // build colorscale
+            
             let color = generateUniqueColors(this.checked_c.length)
-
+            // console.log(document.getElementById('temp').innerHTML)
+            // document.getElementById('temp').innerHTML = String(this.checked_c)
+            // console.log('n',color)
             let colorScale = d3.scaleOrdinal()
                 .domain(this.checked_c)
                 .range(color);
@@ -483,6 +552,10 @@
             this.checked_c.forEach((item)=>{
                 flag[item] = true
             })
+
+            
+            // 
+            // console.log(species[0])
             legend.selectAll(".circles")
                 .data(species)
                 .enter()
@@ -491,25 +564,28 @@
                 .attr('cx', 10)
                 .attr('cy', (d, i) => i * 25 + 30)
                 .attr('r', 8)
-                .on("mouseover", function () { 
+                .on("mouseover", function () { // 突出显示鼠标滑过的图标
                     d3.select(this).transition().attr('r', 12)
                 })
-                .on("mouseout", function () { 
+                .on("mouseout", function () { // 还原
                     d3.select(this).transition().attr('r', 8)
                 })
                 .on("click", function (event, d) { 
-
-                    if (flag[d]) { 
-                        d3.select(this).attr('fill', 'lightgrey') 
-                        d3.selectAll(`.${d}`).attr('stroke', 'lightgrey') 
-                        flag[d] = !flag[d] 
+                    // console.log(d)
+                    // console.log(d3.select(this))// 
+                    if (flag[d]) { // 
+                        d3.select(this).attr('fill', 'lightgrey') // 
+                        d3.selectAll(`.${d}`).attr('stroke', 'lightgrey') // 
+                        flag[d] = !flag[d] // 
                     }
-                    else { 
+                    else { // 
                         d3.select(this).attr('fill', e => colorScale(e))
                         d3.selectAll(`.${d}`).attr('stroke', e => colorScale(e['compressor_id']))
                         flag[d] = !flag[d]
                     }
                 });
+
+            // 
 
             legend.selectAll(".texts")
                 .data(species)
@@ -521,6 +597,9 @@
                 
                 .text(d => d);
             this.svg.attr("transform", `translate(20, 50)`);
+            // 
+            
+            
             
         },
         update:function(){
@@ -547,16 +626,26 @@
             else{
                 document.getElementById('compressor').innerHTML='compressor_compare'
                 const that = this
+                // this.checked_c = []
                 
                 var chartDom = document.getElementById('stat');
+                // var chartDom = document.getElementById('stat');
                 echarts.init(document.getElementById('stat')).dispose(); 
                 let myChart = echarts.init(chartDom);
+                // myChart.resize({
+                //     width: 70,
+                //     height: 400
+                // });
+
 
                 var option = that.option
                 option && myChart.setOption(option);
                 that.myChart = myChart;
 
+                // that.myChart.width=70
                 myChart.on("click",function(params){
+                
+                // that.draw_parallel_c(that.parameters)
                 
                 if(params.componentType =="xAxis" || params.componentType =="yAxis"){
                     if(!that.checked_c.includes(params.value)){
@@ -569,18 +658,22 @@
                     console.log(that.checked_c)
                     console.log(that.name)
                     that.name.forEach((item,i)=>{
+                        // console.log(item)
                         if(that.checked_c.includes(item.value)){
                             that.name[i].textStyle.color =
-                                    '#00ff7f'     
+                                    '#00ff7f'
+                                
                         }
                         else{
                             that.name[i].textStyle.color =
                                     'black'
                         }
                     })
-
+                   
+                    
                     option.xAxis.data = JSON.parse(JSON.stringify(that.name))
                     myChart.setOption(option)
+                    
                     
                 }
             })
@@ -594,8 +687,10 @@
                 
                 select_value.forEach((item,i)=>{
                     if(params.name==select_key[i]){
+                        // let n = that.stats.indexOf(params.name)
                         option.legend[0].selected[select_key[i]] = !that.doubleclick[select_key[i]]
                         that.doubleclick[select_key[i]] = !that.doubleclick[select_key[i]]
+                        // option.series[n].barWidth=20
                     }
                     else{
                         option.legend[0].selected[select_key[i]] = that.doubleclick[select_key[i]]
@@ -621,10 +716,11 @@
   }
   </script>
   
+  <!-- Add "scoped" attribute to limit CSS to this component only -->
   <style scoped>
 #stat{
-    border: 2px solid lightseagreen;
-    border-radius: 10px;
+      border:2px solid #a7b2ac;
+      border-radius: 4px;
       position:absolute;
       top:28%;
       left:29.3%;
@@ -643,6 +739,36 @@
     background-color:'grey'
 }
 
+
+/* #data_selection{
+    border:2px solid #a7b2ac;
+    border-radius: 4px;
+    position:absolute;
+    top:1%;
+    left:.7%;
+    width: 28%;
+    height: 26%;
+}
+
+#parameter{
+    border:2px solid #a7b2ac;
+    border-radius: 4px;
+    position:absolute;
+    top:1%;
+    left:29.3%;
+    width: 70%;
+    height: 26%;
+}
+
+#data_vis{
+    border:2px solid #a7b2ac;
+    border-radius: 4px;
+    position:absolute;
+    top:28%;
+    left:.7%;
+    width: 28%;
+    height: 70%;
+} */
 #compressor{
     z-index:101;
     position:absolute;

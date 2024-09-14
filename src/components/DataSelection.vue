@@ -35,7 +35,8 @@
         <p><strong> Compressor ID: </strong>{{ savedConfigurations[selectedSaveSlot].compressor_id }}</p>
         <p><strong> Bound: </strong>{{ savedConfigurations[selectedSaveSlot].compressor_config['pressio:abs'] }}</p>
         <p><strong> Metrics: </strong>{{ savedConfigurations[selectedSaveSlot].early_config['composite:plugins'].join(', ') }}</p>
-        <t-button @click="editConfiguration">Edit</t-button>
+        <!-- <t-button @click="editConfiguration">Edit</t-button> -->
+        <t-button @click="clearSave(selectedSaveSlot)">Clear</t-button>
         <t-button @click="cancelConfiguration">Cancel</t-button>
         
       </div>
@@ -80,56 +81,15 @@ data(){
       compressorMetrics: [
       {
         label: 'Composite', value:'composite'
-        // children: [
-        //   { label: 'Compression Rate', value: 'composite:compression_rate' },
-        //   { label: 'Compression Rate Many', value: 'composite:compression_rate_many' },
-        //   { label: 'Decompression Rate', value: 'composite:decompression_rate' },
-        //   { label: 'Decompression Rate Many', value: 'composite:decompression_rate_many' }
-        // ]
       },
       {
         label: 'Error Stat', value:'error_stat'
-        // children: [
-        //   { label: 'Average Difference', value: 'error_stat:average_difference' },
-        //   { label: 'Average Error', value: 'error_stat:average_error' },
-        //   { label: 'Difference Range', value: 'error_stat:difference_range' },
-        //   { label: 'Error Range', value: 'error_stat:error_range' },
-        //   { label: 'Max Error', value: 'error_stat:max_error' },
-        //   { label: 'Max REL Error', value: 'error_stat:max_rel_error' },
-        //   { label: 'Min Error', value: 'error_stat:min_error' },
-        //   { label: 'Min REL Error', value: 'error_stat:min_rel_error' },
-        //   { label: 'MSE', value: 'error_stat:mse' },
-        //   { label: 'N', value: 'error_stat:n' },
-        //   { label: 'PSNR', value: 'error_stat:psnr' },
-        //   { label: 'RMSE', value: 'error_stat:rmse' },
-        //   { label: 'Value Max', value: 'error_stat:value_max' },
-        //   { label: 'Value Mean', value: 'error_stat:value_mean' },
-        //   { label: 'Value Min', value: 'error_stat:value_min' },
-        //   { label: 'Value Range', value: 'error_stat:value_range' },
-        //   { label: 'Value STD', value: 'error_stat:value_std' }
-        // ]
       },
       {
         label: 'Size',value:"size"
-        // children: [
-        //   { label: 'Bit Rate', value: 'bit_rate' },
-        //   { label: 'Compressed Size', value: 'compressed_size' },
-        //   { label: 'Compression Ratio', value: 'compression_ratio' },
-        //   { label: 'De-Compressed Size', value: 'decompressed_size' },
-        //   { label: 'Un-Compressed Size', value: 'uncompressed_size' }
-        // ]
       },
       {
         label: 'Time', value:"time"
-        // children: [
-        //   { label: 'Check Options', value: 'check_options' },
-        //   { label: 'Compress', value: 'compress' },
-        //   { label: 'Compress Many', value: 'compress_many' },
-        //   { label: 'Decompress', value: 'decompress' },
-        //   { label: 'De-Compress Many', value: 'decompress_many' },
-        //   { label: 'Get Options', value: 'get_options' },
-        //   { label: 'Set Options', value: 'set_options' }
-        // ]
       }
     ],
   };   
@@ -182,11 +142,16 @@ methods: {
       this.selectedSaveSlot = slot;
       this.showConfigWindow = true;
     },
-    editConfiguration() {
-        this.compressor_id = this.savedConfigurations[this.selectedSaveSlot].compressor_id;
-        this.bound = this.savedConfigurations[this.selectedSaveSlot].compressor_config['pressio:abs'];
-        this.selectedMetrics = [...this.savedConfigurations[this.selectedSaveSlot].early_config['composite:plugins']];
+    clearSave(slot) {
+      this.savedConfigurations[slot] = { compressor_id: '', early_config: {}, compressor_config: {} };
+      this.$message.info(`Save${slot + 1} cleared.`);
+      this.showConfigWindow = false; // Close the config window after clearing
     },
+    // editConfiguration() {
+    //     this.compressor_id = this.savedConfigurations[this.selectedSaveSlot].compressor_id;
+    //     this.bound = this.savedConfigurations[this.selectedSaveSlot].compressor_config['pressio:abs'];
+    //     this.selectedMetrics = [...this.savedConfigurations[this.selectedSaveSlot].early_config['composite:plugins']];
+    // },
     cancelConfiguration() {
       this.showConfigWindow = false;
     },
@@ -277,7 +242,6 @@ methods: {
             this.formData.append('height', data["height"]);
             this.formData.append('depth', data["depth"]);
             this.formData.append('precision', data["precision"]);
-
           });
     },
 
