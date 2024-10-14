@@ -20,7 +20,6 @@
       <t-select id='compressor-select' name="compressor_id" v-model="compressor_id" :options="compressorOptions" label="Compressor:" />
       <t-input name="bound" v-model="bound" label="Bound:" placeholder="bound" />
       </div>
-      <!--<t-select id='compressor-select' v-model="compressor_id" :options="compressorOptions" label="Compressor Name:" />-->
       <div id="metric-selection" :class="closed">
       <t-cascader name="selectedMetrics" v-model="selectedMetrics" :options="compressorMetrics" multiple label="Select Metrics:"
         placeholder="Select Compressor Metrics" :popup-props="{ trigger: 'click'}"/> 
@@ -35,7 +34,6 @@
         <p><strong> Compressor ID: </strong>{{ savedConfigurations[selectedSaveSlot].compressor_id }}</p>
         <p><strong> Bound: </strong>{{ savedConfigurations[selectedSaveSlot].compressor_config['pressio:abs'] }}</p>
         <p><strong> Metrics: </strong>{{ savedConfigurations[selectedSaveSlot].early_config['composite:plugins'].join(', ') }}</p>
-        <!-- <t-button @click="editConfiguration">Edit</t-button> -->
         <t-button @click="clearSave(selectedSaveSlot)">Clear</t-button>
         <t-button @click="cancelConfiguration">Cancel</t-button>
         

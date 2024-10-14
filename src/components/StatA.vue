@@ -1,15 +1,11 @@
 <template>
-    <!-- <div id="chart" style="height:100%;width:100%"></div> -->
     <t-button id="compressor" v-on:click="update">cmp_compare</t-button>
     <t-button id="getvis" v-on:click="draw">draw</t-button>
     <div id="stat">
-    
     </div>
     <p id="temp" ></p>
-
 </template>
-  
-  <script>
+<script>
   import * as d3 from 'd3' 
   import * as echarts from 'echarts'
 
@@ -30,8 +26,8 @@
             option:{
                 tooltip: {
                     trigger: 'axis',
-                    axisPointer: {            // 坐标轴指示器，坐标轴触发有效
-                        type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                    axisPointer: {            
+                        type: 'shadow'        
                     },
                     label: {
                         show: true,
@@ -42,7 +38,6 @@
                         shadowOffsetY: 0,
                     },
                     formatter: function (params) {
-                    // const that = this
                     var htmlStr = '';
                     for(var i=0;i<params.length;i++){
                         var param = params[i];
@@ -54,15 +49,11 @@
                                     htmlStr += xName + '<br/>';//x轴的名称
                                     }
                                     htmlStr +='<div>';
-                                    // 具体显示的数据【字段名称：seriesName，值：value】
-                                    // 这里判断一下name，如果是我们需要特殊处理的，就处理
                                     if(seriesName === '联盟广告'){
-                                        // 前面一条线，后面一条线【具体样式自己写】
                                         htmlStr += '<div style="border: 1px solid #FFEB3B"></div>';
                                         htmlStr += 'xxxx联盟广告：' + value +'单位（%）';
                                         htmlStr += '<div style="border: 1px solid #FFEB3B"></div>';
                                     }else{
-                                        // 正常显示的数据，走默认
                                         htmlStr += '<span style="margin-right:5px;display:inline-block;width:10px;height:10px;border-radius:5px;background-color:'+color+';"></span>';
                                         htmlStr += seriesName + '：' + value + 'W';
                                     }
@@ -73,10 +64,8 @@
                                 }
                 },
                 title: {
-                    // text: '广东省每日确诊和累计出院人数变化趋势',
                     top:20,
                     left: 'center',
-                    
                     textStyle:{
                         fontSize: 25
                     }
@@ -112,13 +101,6 @@
                         type: 'value'
                     }
                 ],
-                // angleAxis: {
-                //     type: 'category',
-                //     data: ''
-                // },
-                // radiusAxis: {},
-                // polar: {},
-                
                 series: '',
                 legend: {
                     show: true,
@@ -127,14 +109,10 @@
                 }
             },
             myChart:null
-        }
-        
-        
+        } 
     },
     mounted() {
         emitter.on('myEvent', (data) => {
-                
-                
                 this.name = data['compressor_id'].map((item)=>{
                     return {
                     value:item,
@@ -146,24 +124,15 @@
                 const size = data['compressor_id'].length
                 const temp = []
                 for(let i =0;i<size;i++){
-                    
                     data['metrics'][i]['compressor_id'] = data['compressor_id'][i]
-                    // q.push(data['compressor_id'][i])
-                    
                     temp.push(data['metrics'][i])
                 }
                 this.parameters = temp
-                // this.draw_levels()
                 if(!this.myChart == null) {
                 this.myChart.dispose()
                 this.myChart = null
             }
-
-
-            // 处理接收到的数据
-            });
-        
-        
+        }); 
     },
     computed: {
     },
@@ -179,13 +148,6 @@
             }
             const that = this
             const parameters = this.parameters
-
-            
-            //     let index
-            //     index =  parseInt(i/2)
-            //     console.log(index)
-            //     item.compressor_id+='_'+String(index)
-            // })
             this.name = Array.from(new Set(parameters.map(item=>item['compressor_id']))).map((item)=>{
                 return {
                     value:item,
@@ -194,9 +156,7 @@
                                 }
                 }
             })
-            
             this.option.xAxis[0].data = this.name
-            // this.option.angleAxis.data = parameters.map(item=>Object.keys(item))[0].filter(d=>d!='compressor_id').map(d=>d.split(':')[1])
             let series = []
             
             that.stats = parameters.map(item=>Object.keys(item))[0].filter(d=>d!='compressor_id').map(d=>d.split(':')[1])
@@ -207,19 +167,10 @@
             this.name.forEach((i)=>{
                 record[i.value] = []
             })
-            
             that.stats.forEach((item,i)=>{
-                // console.log(Object.keys(parameters[0]))
-                // console.log(parameters.map((j)=>j[Object.keys(parameters[0])[i+1]]),)
-                // console.log(Object.values(parameters[0]).filter((item,j)=>Object.keys(parameters[0])[j]!='compressor_id'))
                 const u = normalize(parameters.filter(item=>Object.keys(item)!='compressor_id').map((j)=>j[Object.keys(parameters[0])[i]]).map(item=>parseFloat(item)))
-            
-                // record.push(m)
-                // console.log('v',parameters.map((j)=>j[Object.keys(parameters[0])[i+1]]).map(item=>parseFloat(item)))
                 if(!u.includes(NaN)){
-                
                 this.doubleclick[item] = 0
-                
                 let obj = 
                     {
                     type: 'bar',
@@ -232,33 +183,26 @@
                     itemStyle: {
 							normal: {
 								label: {
-									show: true, //开启显示
-									position: 'top', //在上方显示
-									textStyle: { //数值样式
+									show: true, 
+									position: 'top', 
+									textStyle: { 
 										color: 'black',
 										fontSize: 2
 									}
 								}
 							}}
-                    // stack: 'a',
-                    // emphasis: {
-                    //     focus: 'series'
-                    // }
                     }
                 series.push(obj)
                 selected.item=false
                 }
             })
-            // console.log(series)
             this.option.series = series
             const va =series.map(d=>d.name)
             this.parameters.forEach((item)=>{
-                // console.log(item,va)
                 const value = []
                 Object.keys(item).forEach((q)=>{
                     
                     if(va.includes(q.split(':')[1])){
-                        // console.log('pushing',item[q])
                         value.push(item[q])
                     }
                 })
@@ -266,40 +210,26 @@
                 
             })
     
-            this.option.legend.selected = selected
-            // const that = this
-            // let width = (window.innerWidth*0.7)/1.05;
-            // let height = (window.innerHeight)*0.6/1.05;
-            
+            this.option.legend.selected = selected       
             this.option.tooltip.formatter = function (params) {
-                    // const that = this
                     var htmlStr = '';
-                    
-                    // const idx = params[0].axisIndex
-                    // console.log(params)
                     for(var i=0;i<params.length;i++){
                         
                         var param = params[i];
                         
-                        var xName = param.name;//x轴的名称
-                        // console.log()
-                        var seriesName = param.seriesName;//图例名称
-                        var value = record[param.name][i];//y轴值
-                        var color = param.color;//图例颜色
+                        var xName = param.name;
+                        var seriesName = param.seriesName;
+                        var value = record[param.name][i];
+                        var color = param.color;
                         if(i===0){
-                        htmlStr += xName + '<br/>';//x轴的名称
+                        htmlStr += xName + '<br/>';
                         }
                         htmlStr +='<div>';
-                        // 具体显示的数据【字段名称：seriesName，值：value】
-                        // 这里判断一下name，如果是我们需要特殊处理的，就处理
                         if(seriesName === '联盟广告'){
-                            // 前面一条线，后面一条线【具体样式自己写】
                             htmlStr += '<div style="border: 1px solid #FFEB3B"></div>';
                             htmlStr += 'xxxx联盟广告：' + value +'单位（%）';
                             htmlStr += '<div style="border: 1px solid #FFEB3B"></div>';
                         }else{
-                            // 正常显示的数据，走默认
-                            // console.log('图例',value)
                             htmlStr += '<span style="margin-right:5px;display:inline-block;width:10px;height:10px;border-radius:5px;background-color:'+color+';"></span>';
                             htmlStr += seriesName + ':' + value;
                         }
@@ -327,20 +257,7 @@
                         that.checked_c = that.checked_c.filter(item=>item!=params.value)
                     }
                     console.log(that.checked_c,that.name)
-                    // const yAxisName = params.value
-                    // const yAxisItem = {
-                    // value: yAxisName,
-                    // textStyle: {
-                    //     color: '#00ff7f'
-                    // }
-                    // }
-
-                    // const index = name.findIndex(item => {
-                    //     return that.checked_c.includes(item)
-                    // })
-                    // console.log(index)
                     that.name.forEach((item,i)=>{
-                        // console.log(item)
                         if(that.checked_c.includes(item.value)){
                             that.name[i].textStyle.color =
                                     '#00ff7f'
@@ -351,22 +268,10 @@
                                     'black'
                         }
                     })
-                    // that.checked_c.forEach((q)=>{
-                    //     // console.log(q)
-                    //     name[q].textStyle = {
-                    //     color: '#00ff7f'
-                    // }
-                    // })
-                    // name.splice(index, 1, yAxisItem)
-                    // console.log(that.name)
                     option.xAxis.data = JSON.parse(JSON.stringify(that.name))
                     myChart.setOption(option)
-
-                    
-                    // console.log(option.xAxis[0].textStyle.color)
                 }
             })
-            // console.log(option.tooltip)
             myChart.on('legendselectchanged', function(params) {
                 
                 let option = this.getOption();
@@ -376,11 +281,8 @@
                 
                 select_value.forEach((item,i)=>{
                     if(params.name==select_key[i]){
-                        // let n = that.stats.indexOf(params.name)
                         option.legend[0].selected[select_key[i]] = !that.doubleclick[select_key[i]]
                         that.doubleclick[select_key[i]] = !that.doubleclick[select_key[i]]
-                        
-                        // option.series[n].barWidth='5%'
                     }
                     else{
                         option.legend[0].selected[select_key[i]] = that.doubleclick[select_key[i]]
@@ -393,16 +295,6 @@
                         option.series[i].barWidth=1
                     })
                 }
-                // else{
-                //     // const m = temp.filter(item=>item==true).length
-                //     const length = '5%'
-                //     temp.forEach((item,i)=>{
-                //         if(item){
-                //             option.series[i].barWidth=length
-                //         }
-                        
-                //     })
-                // }
                 this.setOption(option)
                 
                 myChart.setOption(option,true);
@@ -412,8 +304,6 @@
             
         },
         draw:function(){
-            // const data = document.getElementById('temp1').innerHTML
-            
             this.checked_c = []
             if(!this.myChart == null) {
                 echarts.init(document.getElementById('stat')).dispose(); 
@@ -435,41 +325,23 @@
                 }
                 return color
             }
-            // this.compare_mode = !this.compare_mode
-            
             let data1 = data.filter(item=>this.checked_c.includes(item.compressor_id))
-            
-            // console.log(data1)
+
             const svg = this.svg
             let width = (document.getElementById('stat').clientWidth*0.8)
             let height = (document.getElementById('stat').clientHeight*0.8)
             let margin = 40;
-            // console.log(document.getElementById('stat').clientHeight)
-
             let species = this.checked_c;
             let group = svg.append("g");
             let legend = svg.append("g");
-
             let dimensions = Object.keys(data1[0]).filter(item=>item!='compressor_id' && typeof(data1[0][item])!='string' && data1[0][item]!=null)
-            
-            
-            // console.log(data.map(d=>d['compressor_id']))
-            // build colorscale
-            
             let color = generateUniqueColors(this.checked_c.length)
-            // console.log(document.getElementById('temp').innerHTML)
-            // document.getElementById('temp').innerHTML = String(this.checked_c)
-            // console.log('n',color)
             let colorScale = d3.scaleOrdinal()
                 .domain(this.checked_c)
                 .range(color);
-
-            // build xaxis to help make yaxis
             let scaleX = d3.scalePoint()
                 .domain(dimensions)
                 .range([- 0.5*margin, width - 0.5*margin]);
-
-            // build yscale for every dimension.
             let scaleY = {}
             
             dimensions.forEach(function (d) {
@@ -480,14 +352,10 @@
                 }
                 
             });
-
-            // build a path generator
             let lineGenerator = d3.line();
-
-            // draw the line
             group
                 .append("g")
-                .selectAll() // make path 
+                .selectAll() 
                 .data(data1)
                 .enter()
                 .append("path")
@@ -626,31 +494,20 @@
             else{
                 document.getElementById('compressor').innerHTML='compressor_compare'
                 const that = this
-                // this.checked_c = []
                 
                 var chartDom = document.getElementById('stat');
-                // var chartDom = document.getElementById('stat');
                 echarts.init(document.getElementById('stat')).dispose(); 
                 let myChart = echarts.init(chartDom);
-                // myChart.resize({
-                //     width: 70,
-                //     height: 400
-                // });
-
 
                 var option = that.option
                 option && myChart.setOption(option);
                 that.myChart = myChart;
 
-                // that.myChart.width=70
                 myChart.on("click",function(params){
-                
-                // that.draw_parallel_c(that.parameters)
                 
                 if(params.componentType =="xAxis" || params.componentType =="yAxis"){
                     if(!that.checked_c.includes(params.value)){
                         that.checked_c.push(params.value)
-                        
                     }
                     else{
                         that.checked_c = that.checked_c.filter(item=>item!=params.value)
@@ -658,39 +515,25 @@
                     console.log(that.checked_c)
                     console.log(that.name)
                     that.name.forEach((item,i)=>{
-                        // console.log(item)
                         if(that.checked_c.includes(item.value)){
-                            that.name[i].textStyle.color =
-                                    '#00ff7f'
-                                
+                            that.name[i].textStyle.color = '#00ff7f' 
                         }
                         else{
-                            that.name[i].textStyle.color =
-                                    'black'
+                            that.name[i].textStyle.color = 'black'
                         }
                     })
-                   
-                    
                     option.xAxis.data = JSON.parse(JSON.stringify(that.name))
                     myChart.setOption(option)
-                    
-                    
                 }
             })
-            
             myChart.on('legendselectchanged', function(params) {
-                
                 let option = this.getOption();
                 let select_key = Object.keys(params.selected);
                 let select_value = Object.values(params.selected)
-                
-                
                 select_value.forEach((item,i)=>{
                     if(params.name==select_key[i]){
-                        // let n = that.stats.indexOf(params.name)
                         option.legend[0].selected[select_key[i]] = !that.doubleclick[select_key[i]]
                         that.doubleclick[select_key[i]] = !that.doubleclick[select_key[i]]
-                        // option.series[n].barWidth=20
                     }
                     else{
                         option.legend[0].selected[select_key[i]] = that.doubleclick[select_key[i]]
@@ -704,23 +547,18 @@
                     })
                 }
                 this.setOption(option)
-                
                 myChart.setOption(option,true);
         })
-
             }
         }
-
     },
-  
+
   }
-  </script>
-  
-  <!-- Add "scoped" attribute to limit CSS to this component only -->
-  <style scoped>
+</script>
+<style scoped>
 #stat{
-      border:2px solid #a7b2ac;
-      border-radius: 4px;
+      border:2px solid lightseagreen;
+      border-radius: 10px;
       position:absolute;
       top:28%;
       left:29.3%;
@@ -729,7 +567,6 @@
       background-color: #cccecebb;
       
 };
-
 #chart{
     position:absolute;
     top:28%;
@@ -738,37 +575,6 @@
     height: 70%;
     background-color:'grey'
 }
-
-
-/* #data_selection{
-    border:2px solid #a7b2ac;
-    border-radius: 4px;
-    position:absolute;
-    top:1%;
-    left:.7%;
-    width: 28%;
-    height: 26%;
-}
-
-#parameter{
-    border:2px solid #a7b2ac;
-    border-radius: 4px;
-    position:absolute;
-    top:1%;
-    left:29.3%;
-    width: 70%;
-    height: 26%;
-}
-
-#data_vis{
-    border:2px solid #a7b2ac;
-    border-radius: 4px;
-    position:absolute;
-    top:28%;
-    left:.7%;
-    width: 28%;
-    height: 70%;
-} */
 #compressor{
     z-index:101;
     position:absolute;
@@ -786,6 +592,5 @@
 #temp{
     display:none
 }
-
-  </style>
+</style>
 

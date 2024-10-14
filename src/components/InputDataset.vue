@@ -4,11 +4,19 @@
       <h3>Upload Input Dataset</h3>
       <input type="file" id="fileloader" @change="handleFileChange">
       <div id="whd" class="input-section">
-      <t-input id='width' label="width:" v-model="width" placeholder=500 @input="emitFileData" class="input-field"/>
+      <!-- <t-input id='width' label="width:" v-model="width" placeholder=500 @input="emitFileData" class="input-field"/>
       <t-input id='height' label="height:" v-model="height" placeholder=500 @input="emitFileData" class="input-field"/>
       <t-input id='depth' label="depth:" v-model="depth" placeholder=1 @input="emitFileData" class="input-fielddepth"/>
-      <t-input id='precision' label="precision:" v-model="precision" placeholder="d" @input="emitFileData" class="input-field"/>
+      <t-input id='precision' label="precision:" v-model="precision" placeholder="d" @input="emitFileData" class="input-field"/> -->
+      <t-input id='width' label="width:" v-model="width" placeholder=500 class="input-field"/>
+      <t-input id='height' label="height:" v-model="height" placeholder=500 class="input-field"/>
+      <t-input id='depth' label="depth:" v-model="depth" placeholder=1 class="input-fielddepth"/>
+      <t-input id='precision' label="precision:" v-model="precision" placeholder="d" class="input-field"/>
       </div>
+
+      <!-- Add a button for emitting the data -->
+      <t-button class= "submit-button" @click="emitFileData" :disabled="!isFormValid">Submit</t-button>
+
       <h6 v-if="fileContent" style="margin-left: -20px;">File Loaded: {{ fileContent }}</h6>
       </div>
   </div>
@@ -32,6 +40,12 @@ data() {
   uploadMethod: 'requestSuccessMethod',
   };
 },
+// computed: {
+//     // Check if all form fields are filled before allowing emission
+//     isFormValid() {
+//       return this.file && this.width && this.height && this.depth && this.precision;
+//     },
+//   },
 methods:{
 handleFileChange(event){
   
@@ -42,11 +56,12 @@ handleFileChange(event){
   this.formData.append("file", file);
   this.fileContent = file.name;
   this.file = file;
-  this.emitFileData();
+  //this.emitFileData();
 },
 
 emitFileData() {
-      if (this.file && this.width && this.height && this.depth && this.precision) {
+      // if (this.file && this.width && this.height && this.depth && this.precision) {
+      if(this.isFormValid) {
         console.log("Emitting file data:", this.fileContent, this.width, this.height, this.depth);
         emitter.emit('file-selected', {
           file: this.file,
@@ -55,6 +70,9 @@ emitFileData() {
           depth: this.depth,
           precision: this.precision
         });
+        this.$message.success('Dataset emitted successfully!');
+      } else {
+        this.$message.error('Please fill in all fields before submitting.');
       }
     },
 
@@ -94,6 +112,10 @@ computed: {
 requestMethod() {
   return this[this.uploadMethod];
 },
+//Check if all form fields are filled before allowing emission
+    isFormValid() {
+      return this.file && this.width && this.height && this.depth && this.precision;
+    },
 },
 watch: {
   uploadMethod() {

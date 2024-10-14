@@ -6,29 +6,16 @@
   </div>
             <canvas id="canvas1" width="200" height="200"></canvas>
             <canvas id="colorbarCanvas" width="400" height="30"></canvas>
-            
             <t-switch id="switch" size="large" v-model="checked" :label="['add point', 'use current points']"></t-switch>
-        
-            
             <t-input id='slice_id' label="slice_id:" v-model="slice_id" placeholder=23  @enter="onChange" autoWidth/>
-
             <select id="colormapSelect"></select>
-
             <svg id="data_svg"></svg>
-            <!-- <div id="whd" class="input-section">
-            <t-input id='width' label="width:" v-model="width" placeholder=100 @input="emitFileData" class="input-field"/>
-            <t-input id='height' label="height:" v-model="height" placeholder=100 @input="emitFileData" class="input-field"/>
-            <t-input id='depth' label="depth:" v-model="depth" placeholder=1 @input="emitFileData" class="input-field"/>
-        </div> -->
     </div>
-
 </template>
-
+<style scoped src="@/assets/DataVis.css"></style>
 <script>
 import * as d3 from 'd3'
-
 import emitter from './eventBus.js';
-// import axios from 'axios'
 import config from '../../config.json';
 export default {
   name:'DataVis',
@@ -39,7 +26,6 @@ export default {
           checked:true,
           host:config.API_HOST,
           port:config.API_PORT,
-          //file:[],
           file: null,
           colormap:'',
           canvas:'',
@@ -51,7 +37,6 @@ export default {
           width:null,
           height:null,
           depth:null,
-          //precision:null,
           inputNumberProps: { theme: 'column'},
           svg:'',
           margin:40,
@@ -68,17 +53,11 @@ export default {
     this.canvas = document.getElementById('canvas1');
     this.context = this.canvas.getContext('2d');
     await emitter.on('inputdata', (data) => {
-        
-        
         this.width = data['width'];
         this.height = data['height'];
         this.depth = data['depth'];
-        this.input_data = Object.values(data["input_data"]);
-        
-          
+        this.input_data = Object.values(data["input_data"]);  
     })
-    
-    
   },
   computed: {
     requestMethod() {
@@ -86,32 +65,14 @@ export default {
     },
   },
   watch: {
-    // 切换上传示例时，重置 files 数据
     uploadMethod() {
       this.files = [];
     },
   },
   methods:{
-
-    //new parts
-    
-    // emitFileData() {
-    //   if ( this.width && this.height && this.depth ) {
-    //     console.log("Emitting file data:", this.fileContent, this.width, this.height, this.depth);
-    //     emitter.emit('file-selected', {
-    //       //file: this.file,
-    //       width: this.width,
-    //       height: this.height,
-    //       depth: this.depth,
-    //     //   precision: this.precision
-    //     });
-    //   }
-    // },
-
-    requestSuccessMethod(file /** UploadFile */) {
+    requestSuccessMethod(file) {
       console.log(file, file.raw);
       return new Promise((resolve) => {
-        // 控制上传进度
         let percent = 0;
         const percentTimer = setInterval(() => {
           if (percent + 10 < 99) {
@@ -146,55 +107,44 @@ export default {
         for (let j = 0; j < y; j++) {
             const array1D = [];
             for (let k = 0; k < z; k++) {
-                array1D.push(arr[index++]); // 将一维数组的元素逐个分配到三维数组中
+                array1D.push(arr[index++]); 
             }
-            array2D.push(array1D); // 将二维数组加入到三维数组
+            array2D.push(array1D); 
         }
-        array3D.push(array2D); // 将二维数组加入到三维数组
+        array3D.push(array2D); 
     }
 
     return array3D;
     },
-    requestFailMethod(file /** UploadFile */) {
+    requestFailMethod(file) {
       console.log(file);
       return new Promise((resolve) => {
-        // resolve 参数为关键代码
         resolve({ status: 'fail', error: '上传失败，请检查文件是否符合规范' });
       });
     },
     
     showMessage(){
         this.loaddata = 1
-        
                 this.data_vis()
                 this.defaultcolormap()
                 this.draw()
         
     },
     
-    data_vis:function(){
-
-        
+    data_vis:function(){        
         const that = this
-        
         console.log(this.input_data)
         const min1 = d3.min(that.input_data.flat())
         const max1 = d3.max(that.input_data.flat())
-       
-        this.input_data = this.input_data.map((d)=>d.map(i=>(i-min1)/(max1-min1)))
-            
-
-        
+        this.input_data = this.input_data.map((d)=>d.map(i=>(i-min1)/(max1-min1))) 
     },
     draw:function(){
-        // console.log(document.getElementById('input4').value)
         function calculatePercentile(array, percentile) {
             const sortedArray = array.flat().sort((a, b) => a - b);
             const index = Math.floor((percentile / 100) * sortedArray.length);
             return sortedArray[index];
         }
         const that = this
-        // 假设这是你的100x100数组
         const canvas = that.canvas
         const context = that.context
         const data = that.input_data;
@@ -206,15 +156,10 @@ export default {
         const q3 = calculatePercentile(that.input_data.flat(), 75);
 
         function hexToRgb(hex) {
-            // 去掉可能包含的 '#' 符号
             hex = hex.replace(/^#/, '');
-
-            // 将十六进制颜色代码分割成红色、绿色和蓝色部分
             const r = parseInt(hex.slice(0, 2), 16);
             const g = parseInt(hex.slice(2, 4), 16);
             const b = parseInt(hex.slice(4, 6), 16);
-
-            // 返回一个包含 RGB 值的对象
             return {
                 r: r,
                 g: g,
@@ -236,33 +181,22 @@ export default {
         }
 
         const colorControlPoints = [
-            { value: max*255, color: color1[0], label:'max' },   // 蓝色
-            { value: q3*255, color: color1[1], label:'75%'},  // 绿色
-            { value: q2*255, color: color1[2], label:'median'}, // 黄色
-            { value: q1*255, color: color1[3], label:'25%' }, // 橙色
-            { value: min*255, color: color1[4], label:'min' },  // 红色s
+            { value: max*255, color: color1[0], label:'max' },   
+            { value: q3*255, color: color1[1], label:'75%'}, 
+            { value: q2*255, color: color1[2], label:'median'}, 
+            { value: q1*255, color: color1[3], label:'25%' }, 
+            { value: min*255, color: color1[4], label:'min' },
         ];
 
-
-
-// 获取用于绘制图例的容器元素
-// const legendContainer = document.getElementById('legendContainer');
-
-// 创建图例
         function createLegend() {
-        // 遍历控制点，为每个控制点创建一个图例项
         
         console.log('kk')
         }
 
-
-        // 调用创建图例函数
-        // 线性插值计算颜色
         function interpolateColor(value) {
             let lower = colorControlPoints[0];
             let upper = colorControlPoints[colorControlPoints.length - 1];
 
-            // 找到插值区间
             for (let i = 0; i < colorControlPoints.length - 1; i++) {
                 if (value >= colorControlPoints[i].value/255 && value < colorControlPoints[i + 1].value/255) {
                     lower = colorControlPoints[i];
@@ -271,10 +205,8 @@ export default {
                 }
             }
 
-            // 计算插值比例
             const t = (value - lower.value/255) / (upper.value/255 - lower.value/255);
 
-            // 线性插值颜色
             return {
                 r: lower.color.r + (upper.color.r - lower.color.r) * t,
                 g: lower.color.g + (upper.color.g - lower.color.g) * t,
@@ -282,7 +214,6 @@ export default {
             };
         }
 
-// 将数据映射到颜色
         function mapDataToColor(data) {
             return data.map(row => row.map(value => interpolateColor(value)));
         }
@@ -307,32 +238,23 @@ export default {
 
         const colorbarCanvas = document.getElementById('colorbarCanvas');
         const colorbarContext = colorbarCanvas.getContext('2d');
-        const colorbarWidth = 350; // colorbar的宽度
-        const colorbarHeight = 40; // colorbar的高度
-
-        // 绘制colorbar
+        const colorbarWidth = 350;
+        const colorbarHeight = 40; 
 
         function drawColorbar() {
             const gradient = colorbarContext.createLinearGradient(0, 0, colorbarWidth, 0);
-            
-            // 添加控制点颜色
-            
-            
             for (const point of colorControlPoints) {
-                // 使用正确的CSS颜色格式
                 console.log(point.value)
                 gradient.addColorStop(point.value/255, `rgb(${point.color.r}, ${point.color.g}, ${point.color.b})`);
             }
-
             colorbarContext.fillStyle = gradient;
-            
+        
             colorbarContext.fillRect(0, 0, colorbarWidth, colorbarHeight);
-            colorbarContext.strokeStyle = 'black'; // 例如，设置为黑色
+            colorbarContext.strokeStyle = 'black'; 
             colorbarContext.lineWidth = 5;
             colorbarContext.strokeRect(0, 0, colorbarWidth, colorbarHeight);
         }
 
-// 绘制控制点
         function isPointInsideCircle(mouseX, mouseY, point) {
             const x = (point.value / 255) * colorbarWidth;
             const y = colorbarHeight / 2;
@@ -347,73 +269,41 @@ export default {
         const clickX = (e.clientX - colorbarCanvas.getBoundingClientRect().left)* (colorbarCanvas.width / bbox.width)
         const clickY = (e.clientY - colorbarCanvas.getBoundingClientRect().top)* (colorbarCanvas.height / bbox.height)
         
-
-        // 查找并删除被双击的圆
         for (let i = 0; i < colorControlPoints.length; i++) {
             if (isPointInsideCircle(clickX, clickY, colorControlPoints[i])) {
-            // 删除该圆
-            
             colorControlPoints.splice(i, 1);
-            // 重绘Canvas
             drawColorbar()
             drawControlPoints();
-            
             break;
             }
         }
         }
 
-
         function drawControlPoints() {
-            
-            
             for (const point of colorControlPoints) {
-                
                 let x = point.value / 255 * colorbarWidth;
                 if(x==0) x = 3.5
-                
                 const y = colorbarHeight / 2 - 3.5;
-                
-                
                 colorbarContext.beginPath();
-                const text = point.label; // 要显示的文字
-                // console.log(point)
+                const text = point.label; 
                 colorbarContext.arc(x, y, 7, 0, Math.PI * 2);
                 colorbarContext.fillStyle = 'white';
-                // colorbarContext.fillStyle = 'black'; // 文字颜色
-                colorbarContext.font = '5px Arial'; // 文字样式
+                colorbarContext.font = '5px Arial';
                 colorbarContext.fillText(text, x - 4, y + 6 + 12); 
                 colorbarContext.fill();
             }
-            // drawColorbar();
         }
-
-        
         drawColorbar();
         drawControlPoints();
-
         createLegend();
-
-
-
-
-        // 定义拖动状态
         let isDragging = false;
         let selectedControlPoint = null;
-
-
-
         colorbarCanvas.addEventListener('mousedown', (e) => {
             var bbox = colorbarCanvas.getBoundingClientRect();
             if(!this.checked){
-
-            
-            
             const mouseX = (e.clientX - colorbarCanvas.getBoundingClientRect().left)* (colorbarCanvas.width / bbox.width)
             const mouseY = (e.clientY - colorbarCanvas.getBoundingClientRect().top)* (colorbarCanvas.height / bbox.height)
             console.log('点击',mouseX,mouseY)
-
-            // 检查是否点击了控制点
             for (const point of colorControlPoints) {
                 const x = (point.value / 255) * colorbarWidth;
                 const y = colorbarHeight / 2;
@@ -421,13 +311,11 @@ export default {
                 if (distance <= 10) {
                     isDragging = true;
                     selectedControlPoint = point;
-                    // console.log(selectedControlPoint)
                     break;
                 }
             }
         }
             else{
-            
             const clickX = (e.clientX - colorbarCanvas.getBoundingClientRect().left)* (colorbarCanvas.width / bbox.width)
             const clickY = (e.clientY - colorbarCanvas.getBoundingClientRect().top)* (colorbarCanvas.height / bbox.height)
             
@@ -473,11 +361,8 @@ export default {
             colorbarCanvas.addEventListener('mousemove', (e) => {
                 if (isDragging && selectedControlPoint) {
                     const mouseX = e.clientX - colorbarCanvas.getBoundingClientRect().left;
-                    // 限制控制点的移动范围在colorbar内部
                     const newX = Math.min(Math.max(mouseX, 0), colorbarWidth);
                     selectedControlPoint.value = (newX / colorbarWidth) * 255;
-
-                    // 重新绘制colorbar和数据可视化
                     drawColorbar();
                     drawControlPoints();
                     redrawDataVisualization();
@@ -534,8 +419,6 @@ export default {
         this.colormap = defaultColormaps[selectedColormap].split(', ').slice(1,-1)
         this.draw()
     }
-        // this.defaultcolormap()
-        // this.draw()
     },
     defaultcolormap:function(){
         const defaultColormaps = {
@@ -578,120 +461,3 @@ colormapSelect.addEventListener('change', () => {
 }
 }
 </script>
-
-<style scoped>
-#data_vis{
-    border: 2px solid lightseagreen;
-    border-radius: 10px;
-    position:absolute;
-    top:48%;
-    left:.7%;
-    width: 28%;
-    height: 50%;
-    background-color:'lightgrey';
-}
-.input-section {
-  margin-top: 43px;
-  gap: 10px; /* Add space between the textboxes */
-  display: flex;
-  position: absolute;
-}
-
-.input-field {
-    max-width: 150px;
-}
-#data_svg{
-    position: absolute;
-    top:10%;
-    left:-2%
-}
-#slider{
-    position: absolute;
-    top:92%;
-    left:10%;
-    width:88%
-}
-#switch{
-    position: absolute;
-    top:3%;
-    left:80%;
-    z-index:101
-}
-#color{
-    position: absolute;
-    top:-1%;
-    left:10%;
-}
-.item h5 {
-  font-weight: normal;
-}
-#colorbarCanvas{
-    position:absolute;
-    top:90%;
-    left:7%;
-    
-    z-index:101
-}
-#dataCanvas{
-    position:absolute;
-    left:120px; 
-    top:100px;
-    /* z-index:101; */
-}
-#canvas1{
-    position:absolute;
-    left:80px; 
-    top:80px;
-    width:60%
-    
-}
-#file{
-    position:absolute;
-    top:3%;
-    left:59%
-}
-#colormapSelect{
-    position:absolute;
-    left:10px; 
-    top:2%;
-    width:25%;
-    height:8%;
-}
-.legend-item {
-  display: flex;
-  align-items: center;
-  margin-bottom: 5px;
-}
-
-/* 颜色块样式 */
-.color-block {
-  width: 20px;
-  height: 20px;
-  margin-right: 10px;
-  border: 1px solid #000;
-}
-
-/* 标签样式 */
-.label {
-  font-size: 14px; /* 根据需要进行设置 */
-}
-#legendContainer{
-    position:absolute;
-    left:10px; 
-    display: block;
-    /* top:350px; */
-    width:25%
-}
-#slice_id{
-    position: absolute;
-    top:2%;
-    left:30%;
-    z-index:101
-}
-
-#fileloader{
-    position: absolute;
-    top:2%;
-    left:2%;
-}
-</style>
