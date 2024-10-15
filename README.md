@@ -27,14 +27,14 @@ run `python3 src/components/main.py` to run the backend code.
 ```
 The dashboard should look like this figure.
 ```
-![image](https://github.com/YuxiaoLi1234/fzvis/assets/143280350/9cc69ab6-f1bd-4341-a2ee-be83ed3c19ca)
+<img width="1450" alt="Screenshot 2024-10-15 at 7 33 09 PM" src="https://github.com/user-attachments/assets/4ceef310-2008-403f-88a4-1f332e88943f">
 
 ### Workflow
 
 
 ## run compressor:
-  enter the configuration and also the absolute path of your input file. After you have configured all the options, press the Enter key.
-  <img width="434" alt="image" src="https://github.com/YuxiaoLi1234/fzvis/assets/143280350/118e1975-5c44-4e41-9665-404b73f382c9">
+  Enter the configuration. After you have configured all the options, press the Enter key.
+  <img width="1446" alt="Screenshot 2024-10-15 at 7 29 53 PM" src="https://github.com/user-attachments/assets/e316561f-f623-4757-851e-4f8ced961ff1">
   ```
   compresoor_id: Please enter the compressor that is supported by libpressio.
   ```
