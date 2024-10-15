@@ -23,7 +23,8 @@ run `npm run serve` to start vue.
 run `pip3 install -r requirements.txt` to setup the python enviroments.
 run `python3 src/components/main.py` to run the backend code.
 ```
-
+Dashboard Overview - 
+The dashboard allows for easy navigation and interaction with compressor configurations, dataset uploads, and metric visualizations.
 ```
 The dashboard should look like this figure.
 ```
@@ -31,52 +32,44 @@ The dashboard should look like this figure.
 
 ### Workflow
 
+## Running a Compressor:
+  Compressor Selection: Choose a compressor from the dropdown list (e.g., SZ, ZFP).
+  Error Bound: Enter the error bound value.
+  Metric Categories: Select the categories of metrics you want to visualize.
+  Configuration: Save and confirm your configurations.
+  <img width="1446" alt="Screenshot 2024-10-15 at 7 29 53 PM" src="https://github.com/user-attachments/assets/e316561f-f623-4757-851e 4f8ced961ff1">
 
-## run compressor:
-  Enter the configuration. After you have configured all the options, press the Enter key.
-  <img width="1446" alt="Screenshot 2024-10-15 at 7 29 53 PM" src="https://github.com/user-attachments/assets/e316561f-f623-4757-851e-4f8ced961ff1">
-  ```
-  compresoor_id: Please enter the compressor that is supported by libpressio.
-  ```
-  ```
-  You can upload load your file by the fileloader (you can also download the example data "inputfile500.npy/inputfile1000.npy" in the file.
-  ```
-  ```
-  early config: Please include your input with single quotation mark, if you are going to include a path in your configuration, please make sure you entered the absolute path.
-  ```
-  ```
-  compressor_config: Please include your input with single quotation mark. 
-  ```
-  ```
-  
-  ```
-  ```
-  compressor_name: The name for this configuration of compressor.
-  ```
-  - After running all the compressors you need for visualization, click draw on module D.
-  - The reuslt in module D should be like the figure below:
-  
-<img width="1038" alt="image" src="https://github.com/YuxiaoLi1234/fzvis/assets/143280350/4e6f1403-e7be-4e2f-97d8-ffbc21801ae3">
+## Input Dataset
+  Upload the Input Dataset: Upload your dataset file and fill in the dataset dimensions along with the precision value.
+  Run the Compressors: Submit the configurations and execute the compression.
+    - After running all the compressors you need for visualization, click draw on module D.
+    - The reuslt in module D should be like the figure below:
+<img width="416" alt="Screenshot 2024-10-15 at 7 30 59 PM" src="https://github.com/user-attachments/assets/72c360aa-9ae1-4a3c-b383-e1a8fcff0838">
 
-- You can add a new compressor by enter the configuration in module A, remember to click the button Draw in module D to get the new result.
+## Visualization
+The result in the visualization module should appear as shown below:
+<img width="1027" alt="Screenshot 2024-10-15 at 7 31 33 PM" src="https://github.com/user-attachments/assets/06dda073-6252-4d4c-8beb-5061a40bbb28">
+
 
 ### Interaction usage:
 ## Compare Matrics among Compressors.
 1. After running all compressors, you need to click on the name of the compressors you want to compare:
-<img width="850" alt="image" src="https://github.com/YuxiaoLi1234/fzvis/assets/143280350/be90256f-ad14-4e28-a7d6-9383e85b5734">
+<img width="1027" alt="Screenshot 2024-10-15 at 7 31 33 PM" src="https://github.com/user-attachments/assets/06dda073-6252-4d4c-8beb-5061a40bbb28">
 
 2. Click on the compressor_compare button, the result shoule be like the figure below:
-<img width="1028" alt="image" src="https://github.com/YuxiaoLi1234/fzvis/assets/143280350/9b62cdaa-fe26-43c6-ac68-f71e1f615407">
+<img width="1027" alt="Screenshot 2024-10-15 at 7 32 08 PM" src="https://github.com/user-attachments/assets/5d408cd1-7e82-49e4-a7fc-78ff3bfd89eb">
 
 (click on the all_compressor button to return to the visualization of barcharts of all of the compressors)
-3. Then you could interactively select the parameter and compressor you want in module B.
 
-## Input Data Vis:
-- After running the compressors, you can visualize the slice of your input data in module C.
-- Make sure that you input your slice_id, format of your inputdata.
-- Click on the DataVis button to visualize your data.
-- There is a defaultcolormap selector on the top left. You can also add control points by clicking on the colormap for the colormap (under the mode of "add_points")/ drag the existing control points (under the mode of "use current control points").
-<img width="424" alt="image" src="https://github.com/YuxiaoLi1234/fzvis/assets/143280350/7bbbc7e4-20fa-49d3-88f3-f701018bc6b0">
+
+
+## Slice Visualization:
+- After running the compressors, visualize a slice of your input data.
+- Input the slice_id and the format of your input data.
+- Click the DataVis button to view the data.
+- Use the colormap selector to customize your view:
+- Add control points (add_points mode) or drag existing control points (use current control points mode).
+<img width="420" alt="Screenshot 2024-10-15 at 7 32 43 PM" src="https://github.com/user-attachments/assets/66be4982-2995-4e48-b7a8-cbf3744d65a2">
 
 
 
