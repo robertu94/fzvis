@@ -60,7 +60,7 @@ The result in the visualization module should appear as shown below:
 (click on the all_compressor button to return to the visualization of barcharts of all of the compressors)
 
 ## Slice Visualization:
-# After running the compressors, visualize a slice of your input data.
+After running the compressors, visualize a slice of your input data.
 
 - Input the slice_id and the format of your input data.
 - Click the DataVis button to view the data.
