@@ -33,23 +33,28 @@ The dashboard should look like this figure-
 - Error Bound: Enter the error bound value.
 - Metric Categories: Select the categories of metrics you want to visualize.
 - Configuration: Save and confirm your configurations.
+  
 <img width="1446" alt="Screenshot 2024-10-15 at 7 29 53 PM" src="https://github.com/user-attachments/assets/7ac7f072-bc1b-4a9f-9af5-ceef5bd8fc85">
 
 ## Input Dataset
-Upload the Input Dataset: Upload your dataset file and fill in the dataset dimensions along with the precision value.
-Run the Compressors: Submit the configurations and execute the compression.
+- Upload the Input Dataset: Upload your dataset file and fill in the dataset dimensions along with the precision value.
+- Run the Compressors: Submit the configurations and execute the compression.
+  
 <img width="416" alt="Screenshot 2024-10-15 at 7 30 59 PM" src="https://github.com/user-attachments/assets/72c360aa-9ae1-4a3c-b383-e1a8fcff0838">
 
 ## Visualization
 The result in the visualization module should appear as shown below:
+
 <img width="1027" alt="Screenshot 2024-10-15 at 7 31 33 PM" src="https://github.com/user-attachments/assets/06dda073-6252-4d4c-8beb-5061a40bbb28">
 
 ### Interaction usage:
 ## Compare Matrics among Compressors.
 1. After running all compressors, you need to click on the name of the compressors you want to compare:
+   
 <img width="1027" alt="Screenshot 2024-10-15 at 7 31 33 PM" src="https://github.com/user-attachments/assets/06dda073-6252-4d4c-8beb-5061a40bbb28">
 
 2. Click on the compressor_compare button, the result shoule be like the figure below:
+   
 <img width="1027" alt="Screenshot 2024-10-15 at 7 32 08 PM" src="https://github.com/user-attachments/assets/5d408cd1-7e82-49e4-a7fc-78ff3bfd89eb">
 
 (click on the all_compressor button to return to the visualization of barcharts of all of the compressors)
@@ -59,8 +64,9 @@ The result in the visualization module should appear as shown below:
 
 - Input the slice_id and the format of your input data.
 - Click the DataVis button to view the data.
-- Use the colormap selector to customize your view:
+- Use the colormap selector to customize your view.
 - Add control points (add_points mode) or drag existing control points (use current control points mode).
+  
 <img width="420" alt="Screenshot 2024-10-15 at 7 32 43 PM" src="https://github.com/user-attachments/assets/66be4982-2995-4e48-b7a8-cbf3744d65a2">
 
 
