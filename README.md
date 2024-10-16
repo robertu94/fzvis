@@ -62,7 +62,7 @@ The result in the visualization module should appear as shown below:
 ## Slice Visualization:
 After running the compressors, visualize a slice of your input data.
 
-- Input the slice_id and the format of your input data.
+- Input the slice_id.
 - Click the DataVis button to view the data.
 - Use the colormap selector to customize your view.
 - Add control points (add_points mode) or drag existing control points (use current control points mode).
