@@ -14,11 +14,10 @@ cd fzvis
 enter your ip address and port in config.json
 
 ```
-run `npm run serve` to start vue.
+run `./setup-f.sh` to start vue and to run the frontend code.
 ```
 ```
-run `pip3 install -r requirements.txt` to setup the python enviroments.
-run `python3 src/components/main.py` to run the backend code.
+run `./setup-b.sh` to setup the python enviroments and to run the backend code.
 ```
 ## Dashboard Overview - 
 The dashboard allows for easy navigation and interaction with compressor configurations, dataset uploads, and metric visualizations.
