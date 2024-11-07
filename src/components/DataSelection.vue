@@ -193,11 +193,15 @@ methods: {
           if(this.formData.has("configurations")){
               this.formData.delete("configurations");
             }
+          console.log('FormData Entries before submission:', [...this.formData.entries()]);
           this.formData.append("configurations",JSON.stringify(this.savedConfigurations));
+          console.log('FormData Entries before submission2:', [...this.formData.entries()]);
           console.log('FormData before submission:', [...this.formData]);
-          axios.post("http://" + this.host + ':' + String(this.port) + '/indexlist', this.formData)
+         axios.post('http://192.5.86.216:5001/indexlist', this.formData)
+         //axios.post(`http://${this.host}:${this.port}/indexlist`, this.formData)
             .then(response => {
               //let need1 = response.data;
+              console.log('Response from server:', response.data);
               
               for(const key in response.data)
               {
@@ -221,11 +225,16 @@ methods: {
               
               this.loading = false;
             })
-            .catch((error) => {
-              this.loading = false;
-              alert('illegal input');
-              console.log(error);
+            .catch(error => {
+            console.error('Error submitting configuration:', error.response ? error.response.data : error.message);
+            alert('An error occurred. Please check the console for details.');
             });
+
+            //.catch((error) => {
+             //this.loading = false;
+              //alert('illegal input');
+              // console.log(error);
+            //});
 
         }
         console.log('FormData after submission:', [...this.formData]);
@@ -233,6 +242,30 @@ methods: {
       
     },
     mounted() {
+      const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+      //Replace the Floating IP here...
+      const wsURL = `${wsProtocol}//192.5.86.216:8080/ws`;
+
+      console.log("Constructed WebSocket URL:", wsURL);
+
+      this.socket = new WebSocket(wsURL);
+
+      this.socket.onopen = () => {
+            console.log('WebSocket connection established');
+            this.socket.send('Hello from DataSelection component!');
+      };
+
+      this.socket.onmessage = (event) => {
+            console.log('Message from server:', event.data);
+      };
+
+      this.socket.onclose = () => {
+            console.log('WebSocket connection closed');
+      };
+
+      this.socket.onerror = (error) => {
+            console.error('WebSocket error:', error);
+      };
       emitter.on('file-selected', (data) => {
             console.log("datamounted", data);
             this.formData.append('file', data["file"]);
@@ -242,7 +275,5 @@ methods: {
             this.formData.append('precision', data["precision"]);
           });
     },
-
-    
-  }
+  };
 </script>
