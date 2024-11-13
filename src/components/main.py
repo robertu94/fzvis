@@ -12,7 +12,6 @@ import websockets
 from threading import Thread
 #from flask_socketio import SocketIO
 
-
 app = Flask(__name__)
 CORS(app)
 

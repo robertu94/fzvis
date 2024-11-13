@@ -1,4 +1,4 @@
-#!/home/hdevaiah/fzvis/env/bin/python3.11
+#!/home/cc/fzvis/env/bin/python3.11
 # -*- coding: utf-8 -*-
 import re
 import sys
