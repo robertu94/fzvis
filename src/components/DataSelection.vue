@@ -197,7 +197,7 @@ methods: {
           this.formData.append("configurations",JSON.stringify(this.savedConfigurations));
           console.log('FormData Entries before submission2:', [...this.formData.entries()]);
           console.log('FormData before submission:', [...this.formData]);
-         axios.post('http://192.5.86.216:5001/indexlist', this.formData)
+         axios.post('http://192.5.87.116:5001/indexlist', this.formData)
          //axios.post(`http://${this.host}:${this.port}/indexlist`, this.formData)
             .then(response => {
               //let need1 = response.data;
@@ -244,7 +244,7 @@ methods: {
     mounted() {
       const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
       //Replace the Floating IP here...
-      const wsURL = `${wsProtocol}//192.5.86.216:8080/ws`;
+      const wsURL = `${wsProtocol}//192.5.87.116:8080/ws`;
 
       console.log("Constructed WebSocket URL:", wsURL);
 

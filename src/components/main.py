@@ -10,13 +10,12 @@ import math
 import asyncio
 import websockets
 from threading import Thread
-from flask_socketio import SocketIO
-
+#from flask_socketio import SocketIO
 
 app = Flask(__name__)
 CORS(app)
 
-socketio = SocketIO(app, cors_allowed_origins="*")
+#socketio = SocketIO(app, cors_allowed_origins="*")
 
 @app.route('/indexlist', methods=["GET", "POST"])
 
@@ -128,19 +127,22 @@ def indexlist():
     else:
         return jsonify({"error": "configuration is illegal"}), 400
 
-@socketio.on("connect")
-def handle_connect():
-    print("Client connected")
-    socketio.emit("message", {"data": "WebSocket connection established"})
+async def websocket_handler(websocket, path):
+    print("WebSocket connection established")
+    try:
+        async for message in websocket:
+            print("Received message:", message)
+            # Echo the message back to the client
+            await websocket.send(f"Echo: {message}")
+    except websockets.exceptions.ConnectionClosedError:
+        print("Client disconnected")
 
-@socketio.on("disconnect")
-def handle_disconnect():
-    print("Client disconnected")
-
-@socketio.on("message")
-def handle_message(data):
-    print("Received message:", data)
-    socketio.emit("message", {"data": f"Echo: {data}"})
+def start_websocket_server():
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    server = websockets.serve(websocket_handler, "0.0.0.0", 8080)
+    loop.run_until_complete(server)
+    loop.run_forever()
 
 parser = ArgumentParser(description="enter your HOST/POST.", usage="path/to/main.py [OPTIONAL ARGUMENTS] <HOST> <PORT> <configfile>")
 parser.add_argument('--HOST', nargs='?', help='HOST_address', default="0.0.0.0")
@@ -165,5 +167,5 @@ if __name__ == '__main__':
     }
     with open('./config.json', 'w') as json_file:
         json.dump(config, json_file, indent=4)
-    socketio.run(app, host=api_host, port = api_port, debug=True, allow_unsafe_werkzeug=True)
-
+#    socketio.run(app, host=api_host, port = api_port, debug=True, allow_unsafe_werkzeug=True)
+    app.run(host=api_host, port = api_port, debug=True)
