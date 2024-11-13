@@ -197,6 +197,7 @@ methods: {
           this.formData.append("configurations",JSON.stringify(this.savedConfigurations));
           console.log('FormData Entries before submission2:', [...this.formData.entries()]);
           console.log('FormData before submission:', [...this.formData]);
+          //Replace the Floating IP here...
          axios.post('http://192.5.86.216:5001/indexlist', this.formData)
          //axios.post(`http://${this.host}:${this.port}/indexlist`, this.formData)
             .then(response => {
