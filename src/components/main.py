@@ -7,15 +7,23 @@ import numpy as np
 import libpressio
 from argparse import ArgumentParser
 import math
+import asyncio
+import websockets
+from threading import Thread
+#from flask_socketio import SocketIO
+
 
 app = Flask(__name__)
-
 CORS(app)
+
+#socketio = SocketIO(app, cors_allowed_origins="*")
 
 @app.route('/indexlist', methods=["GET", "POST"])
 
 def indexlist():
-
+    print("Request method:", request.method)
+    print("Request form data:", request.form)
+    print("Request files:", request.files)
     global input_data, depth, height, depth
 
     def replace_unsupported_values(obj):
@@ -34,16 +42,6 @@ def indexlist():
     def comparing_compressor(arguments):
         global  input_data, width, depth, height
         print("arguments: ", arguments)
-        # # if 'composite:plugins' in arguments['early_config'] and not arguments['early_config']['composite:plugins']:
-        # #     print("No composite plugins found, skipping processing for this configuration.")
-        # # return {"error": "No valid composite plugins provided"}
-        # configs = {
-        #     "compressor_id": arguments["compressor_id"],
-        #     "early_config": arguments["early_config"],
-        #     "compressor_config": arguments["compressor_config"],
-        #     "bound": arguments["compressor_config"]["pressio:abs"]
-        # }
-        # Dynamically handle different metric selections
         def get_metrics_configuration(metrics):
             if 'composite' in metrics:
                 # If composite is selected, use all metrics
@@ -71,10 +69,6 @@ def indexlist():
             compressor = libpressio.PressioCompressor.from_config({
                 "compressor_id": args['compressor_id'],
                 "early_config": args['early_config'],
-                # "early_config": {
-                #     "pressio:metric": "composite",
-                #     "composite:plugins": ["time", "size", "error_stat"],
-                # },
                 "compressor_config": args['compressor_config']
             })
             decomp_data = input_data.copy()
@@ -85,7 +79,6 @@ def indexlist():
             print("Metrics returned by compressor:", metrics)
             metrics1 = replace_unsupported_values(metrics)
             print("Sanitized metrics:", metrics1)
-            #return {'compressor_id': configs["compressor_id"], 'bound': configs['bound'], 'metrics': metrics1}
             return {
                 "compressor_id": args['compressor_id'],
                 "bound": args["bound"],
@@ -93,7 +86,6 @@ def indexlist():
             }
         result = run_compressor(configs)
         print(result)
-        # print(result)
         return result
     print('yes')
     if request.method == 'POST':
@@ -113,16 +105,6 @@ def indexlist():
                 input_data = np.fromfile(file, dtype=np.float64).reshape(width, height, depth)
             elif precision=='f': 
                 input_data = np.fromfile(file, dtype=np.float32).reshape(width, height, depth)
-            # input_data = np.load(file).reshape(width, height, depth)
-            
-            # compressor_id = request.form['compressor_id']
-            # early_config = json.loads(request.form.get('early_config'))
-            # compressor_config = json.loads(request.form.get('compressor_config'))
-            # configration = {'compressor_id':compressor_id, 
-            #                 'early_config':early_config,
-            #                 'compressor_config':compressor_config,
-            #                 'input_data':input_data
-            #                 }
             configurations = json.loads(request.form.get('configurations'))
             print(configurations)
             result = {}
@@ -137,19 +119,35 @@ def indexlist():
             result['input_data'] = input_data.tolist()
             
             #return json.loads(json.dumps(output,indent=2))
-            return result
+            return jsonify(result)
         else: 
-            return 0
+            #return 0
+            return jsonify({"message": "No data loaded"})
             # print(slice_number,sliced_id,slice_width,slice_height,type(input_data),len(input_data))
             
     else:
-        return 'configuration is illegal'
+        return jsonify({"error": "configuration is illegal"}), 400
+
+async def websocket_handler(websocket, path):
+    print("WebSocket connection established")
+    try:
+        async for message in websocket:
+            print("Received message:", message)
+            # Echo the message back to the client
+            await websocket.send(f"Echo: {message}")
+    except websockets.exceptions.ConnectionClosedError:
+        print("Client disconnected")
+
+def start_websocket_server():
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    server = websockets.serve(websocket_handler, "0.0.0.0", 8080)
+    loop.run_until_complete(server)
+    loop.run_forever()
 
 parser = ArgumentParser(description="enter your HOST/POST.", usage="path/to/main.py [OPTIONAL ARGUMENTS] <HOST> <PORT> <configfile>")
-
-parser.add_argument('--HOST', nargs='?', help='HOST_address', default="localhost")
+parser.add_argument('--HOST', nargs='?', help='HOST_address', default="0.0.0.0")
 parser.add_argument('--PORT', nargs='?', help='PORT_address', default="5001")
-
 parser.add_argument('--configfile', nargs='?', help='your_config_file', default=None)   
 
 if __name__ == '__main__':
@@ -170,4 +168,5 @@ if __name__ == '__main__':
     }
     with open('./config.json', 'w') as json_file:
         json.dump(config, json_file, indent=4)
+#    socketio.run(app, host=api_host, port = api_port, debug=True, allow_unsafe_werkzeug=True)
     app.run(host=api_host, port = api_port, debug=True)
