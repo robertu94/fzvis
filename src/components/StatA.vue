@@ -566,7 +566,7 @@
       height: 70%;
       background-color: #cccecebb;
       
-};
+}
 #chart{
     position:absolute;
     top:28%;

@@ -41,7 +41,7 @@
       <p id="temp1" ></p>
   </div>
 </template>
-<style scoped src="@/assets/DataSelection.css"></style>
+//<style scoped src="@/assets/DataSelection.css"></style>
 <script>
 import axios from 'axios'
 import emitter from './eventBus.js';
@@ -197,10 +197,12 @@ methods: {
           this.formData.append("configurations",JSON.stringify(this.savedConfigurations));
           console.log('FormData Entries before submission2:', [...this.formData.entries()]);
           console.log('FormData before submission:', [...this.formData]);
-         axios.post('http://192.5.87.116:5001/indexlist', this.formData)
-         //axios.post(`http://${this.host}:${this.port}/indexlist`, this.formData)
+          //const backendProtocol = window.location.protocol;
+          //const backendHost = window.location.hostname;
+          //const backendPort = '5001';       
+          //const baseURL = `${backendProtocol}//${backendHost}:${backendPort}`;
+          axios.post(`/indexlist`, this.formData)
             .then(response => {
-              //let need1 = response.data;
               console.log('Response from server:', response.data);
               
               for(const key in response.data)
@@ -242,30 +244,7 @@ methods: {
       
     },
     mounted() {
-      const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      //Replace the Floating IP here...
-      const wsURL = `${wsProtocol}//192.5.87.116:8080/ws`;
 
-      console.log("Constructed WebSocket URL:", wsURL);
-
-      this.socket = new WebSocket(wsURL);
-
-      this.socket.onopen = () => {
-            console.log('WebSocket connection established');
-            this.socket.send('Hello from DataSelection component!');
-      };
-
-      this.socket.onmessage = (event) => {
-            console.log('Message from server:', event.data);
-      };
-
-      this.socket.onclose = () => {
-            console.log('WebSocket connection closed');
-      };
-
-      this.socket.onerror = (error) => {
-            console.error('WebSocket error:', error);
-      };
       emitter.on('file-selected', (data) => {
             console.log("datamounted", data);
             this.formData.append('file', data["file"]);
@@ -277,3 +256,6 @@ methods: {
     },
   };
 </script>
+<style scoped>
+@import "@/assets/DataSelection.css";
+</style>

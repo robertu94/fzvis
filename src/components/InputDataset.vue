@@ -21,7 +21,9 @@
       </div>
   </div>
 </template>
-<style scoped src="@/assets/InputDataset.css"></style>
+<style scoped>
+@import "@/assets/InputDataset.css";
+</style>
 <script>
 import emitter from './eventBus.js';
 export default {
