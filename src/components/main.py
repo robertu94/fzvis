@@ -8,24 +8,29 @@ import libpressio
 from argparse import ArgumentParser
 import math
 
-project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-dist_dir = None
 
-# Search for 'dist' directory up to a few levels above
-for i in range(4):
-    potential_dist = os.path.join(project_root, *(['..'] * i), 'dist')
-    if os.path.exists(potential_dist):
-        dist_dir = os.path.abspath(potential_dist)
-        break
+# Attempt to locate the dist directory based on Robert's path first
+dist_dir = Path(__file__).parent.parent / "usr/libexec/fzvis/ui"
+if not dist_dir.exists():
+    # If the specific path does not exist, search up to a few levels above
+    project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+    for i in range(4):
+        potential_dist = os.path.join(project_root, *(['..'] * i), 'dist')
+        if os.path.exists(potential_dist):
+            dist_dir = os.path.abspath(potential_dist)
+            break
+    else:
+        print("'dist' directory not found.")
+        dist_dir = None
 
 if dist_dir is None:
-    print("'dist' directory not found.")
+    print("Error: No 'dist' directory located.")
 else:
     print(f"'dist' directory located at: {dist_dir}")
 
-#app = Flask(__name__, static_folder=dist_dir, static_url_path='')
-
 app = Flask(__name__)
+
+
 
 @app.route('/indexlist', methods=["GET", "POST"])
 
