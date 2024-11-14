@@ -66,7 +66,7 @@ data(){
       compressorOptions: [
       { label: 'SZ', value: 'sz' },
       { label: 'ZFP', value: 'zfp' },
-      { label: 'MGARD', value: 'mgard' },
+      //{ label: 'MGARD', value: 'mgard' },
       ],
       selectedMetrics: [],
       savedConfigurations: {
