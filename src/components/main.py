@@ -1,5 +1,5 @@
 import os
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from pathlib import Path
 import json
@@ -7,15 +7,23 @@ import numpy as np
 import libpressio
 from argparse import ArgumentParser
 import math
-import asyncio
-import websockets
-from threading import Thread
-#from flask_socketio import SocketIO
 
-app = Flask(__name__)
-CORS(app)
+project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
+dist_dir = None
 
-#socketio = SocketIO(app, cors_allowed_origins="*")
+# Search for 'dist' directory up to a few levels above
+for i in range(4):
+    potential_dist = os.path.join(project_root, *(['..'] * i), 'dist')
+    if os.path.exists(potential_dist):
+        dist_dir = os.path.abspath(potential_dist)
+        break
+
+if dist_dir is None:
+    print("'dist' directory not found.")
+else:
+    print(f"'dist' directory located at: {dist_dir}")
+
+app = Flask(__name__, static_folder=dist_dir, static_url_path='')
 
 @app.route('/indexlist', methods=["GET", "POST"])
 
@@ -127,22 +135,18 @@ def indexlist():
     else:
         return jsonify({"error": "configuration is illegal"}), 400
 
-async def websocket_handler(websocket, path):
-    print("WebSocket connection established")
-    try:
-        async for message in websocket:
-            print("Received message:", message)
-            # Echo the message back to the client
-            await websocket.send(f"Echo: {message}")
-    except websockets.exceptions.ConnectionClosedError:
-        print("Client disconnected")
+# Catch-all route to serve the Vue frontend's index.html
+@app.route('/', defaults={'path': ''})
+@app.route('/<path:path>')
+def serve_frontend(path):
+    print(f"Requested path: {path}")
+    full_path = os.path.join(app.static_folder, path)
+    print(f"Full path: {full_path}")
+    if os.path.isfile(full_path):
+        return send_from_directory(app.static_folder, path)
+    else:
+        return send_from_directory(app.static_folder, 'index.html')
 
-def start_websocket_server():
-    loop = asyncio.new_event_loop()
-    asyncio.set_event_loop(loop)
-    server = websockets.serve(websocket_handler, "0.0.0.0", 8080)
-    loop.run_until_complete(server)
-    loop.run_forever()
 
 parser = ArgumentParser(description="enter your HOST/POST.", usage="path/to/main.py [OPTIONAL ARGUMENTS] <HOST> <PORT> <configfile>")
 parser.add_argument('--HOST', nargs='?', help='HOST_address', default="0.0.0.0")
@@ -167,5 +171,4 @@ if __name__ == '__main__':
     }
     with open('./config.json', 'w') as json_file:
         json.dump(config, json_file, indent=4)
-#    socketio.run(app, host=api_host, port = api_port, debug=True, allow_unsafe_werkzeug=True)
     app.run(host=api_host, port = api_port, debug=True)
