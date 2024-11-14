@@ -8,11 +8,8 @@ import libpressio
 from argparse import ArgumentParser
 import math
 
-
-# Attempt to locate the dist directory based on Robert's path first
 dist_dir = Path(__file__).parent.parent / "usr/libexec/fzvis/ui"
 if not dist_dir.exists():
-    # If the specific path does not exist, search up to a few levels above
     project_root = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
     for i in range(4):
         potential_dist = os.path.join(project_root, *(['..'] * i), 'dist')
