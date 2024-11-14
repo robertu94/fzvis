@@ -23,7 +23,9 @@ if dist_dir is None:
 else:
     print(f"'dist' directory located at: {dist_dir}")
 
-app = Flask(__name__, static_folder=dist_dir, static_url_path='')
+#app = Flask(__name__, static_folder=dist_dir, static_url_path='')
+
+app = Flask(__name__)
 
 @app.route('/indexlist', methods=["GET", "POST"])
 
@@ -135,17 +137,22 @@ def indexlist():
     else:
         return jsonify({"error": "configuration is illegal"}), 400
 
-# Catch-all route to serve the Vue frontend's index.html
+#Catch-all route to serve the Vue frontend's index.html
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')
 def serve_frontend(path):
+
+    #if app.static_folder is None:
+        #print("Error: app.static_folder is None.")
+        #return "Static folder not set", 500
+
     print(f"Requested path: {path}")
-    full_path = os.path.join(app.static_folder, path)
+    full_path = os.path.join(dist_dir, path)
     print(f"Full path: {full_path}")
     if os.path.isfile(full_path):
-        return send_from_directory(app.static_folder, path)
+        return send_from_directory(dist_dir, path)
     else:
-        return send_from_directory(app.static_folder, 'index.html')
+        return send_from_directory(dist_dir, 'index.html')
 
 
 parser = ArgumentParser(description="enter your HOST/POST.", usage="path/to/main.py [OPTIONAL ARGUMENTS] <HOST> <PORT> <configfile>")
